@@ -220,7 +220,7 @@ ai-it-ops-assistant/
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ai-it-ops-assistant.git
+   git clone https://github.com/baqir110/ai-it-ops-assistant.git
    cd ai-it-ops-assistant
    ```
 
@@ -430,7 +430,7 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 ## 📧 Contact
 
 **Author**: Muhammad Baqir  
-**GitHub**: [github.com/YOUR_USERNAME](https://github.com/baqir110)  
+**GitHub**: [github.com/baqir110](https://github.com/baqir110)  
 **LinkedIn**: [Muhammad Baqir](https://linkedin.com/in/muhammad-baqir-it)
 
 ---
