@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+chromadb
+scikit-learn
+numpy
+sentence-transformers
+langchain-core
+langchain-community
+langchain-huggingface
+langchain-chroma
+pytest
+httpxopenai

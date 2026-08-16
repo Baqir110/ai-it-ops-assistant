@@ -1,0 +1,12 @@
+{
+  "cpu_percent": 94.0,
+  "ram_percent": 91.0,
+  "disk_percent": 97.0,
+  "services": {
+    "apache2": "DOWN",
+    "postgresql": "UP"
+  },
+  "http_endpoints": {
+    "https://app.internal/health": 503
+  }
+}

@@ -1,0 +1,12 @@
+services:
+  it-ops-assistant:
+    build: .
+    container_name: ai_it_ops_assistant
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - CPU_THRESHOLD=85.0
+      - RAM_THRESHOLD=85.0
+      - DISK_THRESHOLD=90.0
