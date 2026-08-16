@@ -1,13 +1,13 @@
-# Real-Time Data Engineering Pipeline
+# AI-Powered IT Operations Assistant
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-green.svg)](https://fastapi.tiangolo.com/)
-[![Pandas](https://img.shields.io/badge/pandas-2.0+-orange.svg)](https://pandas.pydata.org/)
-[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red.svg)](https://www.sqlalchemy.org/)
-[![pytest](https://img.shields.io/badge/pytest-7.0+-yellow.svg)](https://docs.pytest.org/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
+[![LangChain](https://img.shields.io/badge/LangChain-0.3+-orange.svg)](https://www.langchain.com/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-purple.svg)](https://www.trychroma.com/)
+[![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-yellow.svg)](https://huggingface.co/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![pytest](https://img.shields.io/badge/pytest-7.0+-red.svg)](https://docs.pytest.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
@@ -18,17 +18,15 @@
 - [Architecture](#architecture)
 - [Key Features](#key-features)
 - [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
+- [Repository Structure](#repository-structure)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running the Application](#running-the-application)
+  - [Local Setup](#local-setup)
+  - [Running with Docker](#running-with-docker)
 - [Configuration](#configuration)
-- [API Reference](#api-reference)
-  - [Trigger ETL Pipeline](#post-apiv1trigger-etl)
-  - [Retrieve Metrics](#get-apiv1metrics)
+- [Sample Payload & Output](#sample-payload--output)
 - [Testing](#testing)
-- [Monitoring & Logging](#monitoring--logging)
+- [Monitoring & Observability](#monitoring--observability)
 - [Deployment](#deployment)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -39,85 +37,98 @@
 
 ## 📖 Overview
 
-A **production-grade data engineering pipeline** that ingests live public data, performs automated cleaning and validation, transforms datasets into business insights, persists aggregated metrics into a relational database, and exposes analytical endpoints via a RESTful API.
+An **automated AIOps incident triage engine** built with FastAPI, LangChain, ChromaDB, and Pydantic. The platform ingests real-time infrastructure telemetry (CPU, RAM, Disk, process health, HTTP status), identifies active system anomalies, and performs vector similarity search against operational runbooks to synthesize structured incident reports.
 
-This project demonstrates end-to-end data engineering best practices, including:
+This system transforms raw infrastructure metrics into actionable intelligence, reducing Mean Time to Detection (MTTD) and Mean Time to Resolution (MTTR) by automating the initial incident analysis and remediation recommendation process.
 
-- **ETL Automation**: Scheduled and on-demand data processing with idempotency guarantees.
-- **Data Quality**: Schema validation, anomaly detection, and cleansing using Pandas and Pydantic.
-- **Analytics**: Aggregated metrics and business intelligence ready for consumption.
-- **Observability**: Comprehensive logging, error handling, and health checks.
-
-The pipeline fetches sample user data from the [JSONPlaceholder](https://jsonplaceholder.typicode.com/) API, extracts email domains, counts unique domains, and stores the aggregated metrics in a local SQLite database (or a PostgreSQL instance). The resulting data can be queried via a clean REST API.
+**Key Differentiators**:
+- **Zero‑configuration RAG**: Pre‑indexed runbook knowledge base with embeddings for instant retrieval.
+- **Strongly Typed Incident Reports**: Pydantic‑enforced schemas ensure consistent output for downstream automation.
+- **Container‑Native**: Full Docker support with a lightweight Python 3.11 base image.
+- **Extensible Rule Engine**: Easily add custom threshold rules and anomaly detection logic.
 
 ---
 
 ## 🎯 Use Cases
 
-- **Data Ingestion Prototype**: Quickly set up a data ingestion framework for evaluating external data sources.
-- **Analytics Dashboard Backend**: Feed aggregated metrics to a dashboard or BI tool.
-- **Learning Tool**: Understand ETL patterns, data validation, and REST API design in Python.
-- **Foundation for Real‑Time Pipelines**: Extend to streaming data with Apache Kafka or similar.
+- **Infrastructure Monitoring**: Automatically analyze telemetry from servers, containers, or cloud instances.
+- **On‑Call Support**: Provide first‑line incident context and recommended actions to SREs.
+- **Runbook Automation**: Retrieves relevant operational procedures and presents them in a structured format.
+- **AIOps Playground**: A reference implementation for integrating RAG into IT operations workflows.
+- **Self‑Healing Systems**: Feed the structured output into automated remediation pipelines (e.g., Ansible, Kubernetes operators).
 
 ---
 
 ## 🏗️ Architecture
 
 ```mermaid
-flowchart LR
-    A[Public API\nJSONPlaceholder] --> B[Python Ingestion Module]
-    B --> C[Pandas Validation &\nTransformation]
-    C --> D[SQLAlchemy ORM]
-    D --> E[Relational Database\nSQLite / PostgreSQL]
-    E --> F[FastAPI REST\nAnalytics Endpoints]
-    
-    style A fill:#4CAF50,color:#fff
-    style B fill:#2196F3,color:#fff
-    style C fill:#FF9800,color:#fff
-    style D fill:#9C27B0,color:#fff
-    style E fill:#F44336,color:#fff
-    style F fill:#00BCD4,color:#fff
+flowchart TB
+    subgraph Input
+        T[Telemetry Payload JSON]
+    end
+
+    subgraph Processing
+        API[FastAPI Endpoint]
+        RE[Rule Engine<br/>Anomaly Detection]
+        VS[Vector Similarity Search<br/>ChromaDB]
+        RS[Incident Report Synthesizer]
+    end
+
+    subgraph Data
+        RB[Runbook Knowledge Base<br/>Markdown Files]
+        VD[(Vector Database<br/>all-MiniLM-L6-v2)]
+    end
+
+    subgraph Output
+        IR[Structured Incident Report JSON]
+    end
+
+    T --> API
+    API --> RE
+    RE -->|Anomalies| VS
+    RB --> VD
+    VD --> VS
+    VS -->|Top K Runbooks| RS
+    RS --> IR
 ```
 
 ### Data Flow
 
 | Stage | Component | Description |
 |-------|-----------|-------------|
-| **Ingestion** | Python Module | Fetches real-time data from external REST API with retries and timeout handling. |
-| **Validation** | Pandas + Pydantic | Enforces schema integrity (required fields, data types) and quality rules (non‑null, valid email format). |
-| **Transformation** | Pandas | Cleans anomalies (e.g., duplicates), parses email domains, computes aggregates (unique domains, record counts). |
-| **Storage** | SQLAlchemy ORM | Manages relational storage with automatic session handling and transaction management. |
-| **Exposure** | FastAPI | Serves analytical insights via REST endpoints with pagination and filtering. |
+| **Ingestion** | FastAPI Endpoint | Receives telemetry payload via POST `/api/v1/telemetry/analyze`. |
+| **Anomaly Detection** | Rule Engine | Evaluates metrics against defined thresholds; flags violations and service failures. |
+| **Context Retrieval** | ChromaDB + LangChain | Embeds anomaly signatures and retrieves top‑matching runbooks. |
+| **Report Synthesis** | Incident Synthesizer | Combines anomaly data and runbook context into a structured JSON incident report. |
+| **Output** | Incident Report | Returns severity, root cause, recommended actions, escalation path, and sources. |
 
 ---
 
-## ✨ Key Features
+## ⚡ Key Features
 
-- **🔄 Automated ETL Pipeline**
-  - Real‑time external data fetching with configurable timeouts.
-  - Anomaly detection (e.g., duplicate records, malformed emails) and data cleansing.
-  - Business insight extraction — email domain parsing, count aggregation, and timestamp tracking.
-  - Structured metric persistence with automatic schema creation.
+### 🔍 Automated Anomaly Detection
+- Monitors **CPU, RAM, Disk, service health**, and **HTTP endpoints**.
+- Configurable threshold rules (e.g., CPU > 90% triggers a **HIGH** severity alert).
+- Flags both threshold violations and service failures instantly.
 
-- **✅ Data Validation**
-  - Pandas transformation pipelines with custom validation functions.
-  - Pydantic models for request/response validation and internal data contracts.
-  - Integrity checks: non‑null constraints, unique identifiers, and data type enforcement.
+### 📚 RAG-Powered Runbook Retrieval
+- Embeds anomaly signatures using `all-MiniLM-L6-v2` via HuggingFace Transformers.
+- Stores and retrieves operational runbooks using **ChromaDB** vector store.
+- Returns the most relevant procedures with similarity scores for transparency.
 
-- **💾 Relational Storage**
-  - SQLAlchemy ORM with support for SQLite (development) and PostgreSQL (production).
-  - Automatic session handling and connection pooling.
-  - Migration support using Alembic (optional but ready).
+### 📋 Structured Incident Reports
+- Strongly typed schemas using **Pydantic v2**.
+- Includes: incident title, severity, likely cause, recommended actions, escalation criteria, and sources consulted.
+- Predictable, machine‑readable output for integration with ticketing systems (Jira, ServiceNow) or automation tools.
 
-- **🌐 RESTful API**
-  - FastAPI backend with interactive Swagger UI (`/docs`) and ReDoc (`/redoc`).
-  - JSON response formatting with structured error payloads.
-  - Comprehensive error handling with meaningful HTTP status codes.
+### 🐳 Container‑Ready
+- Optimized Dockerfile with multi‑stage builds.
+- `docker-compose` support for local development and testing.
+- Minimal dependencies for a lightweight footprint.
 
-- **🧪 Automated Testing**
-  - Full integration test coverage using `pytest`.
-  - Endpoint validation and ETL pipeline testing with fixtures.
-  - CI/CD ready with GitHub Actions workflow included.
+### 🧪 Test Coverage
+- Comprehensive `pytest` suite covering the rule engine, RAG retrieval, and API endpoints.
+- Sample telemetry payloads provided for manual testing.
 
 ---
 
@@ -125,53 +136,71 @@ flowchart LR
 
 | Category | Technology | Version |
 |----------|------------|---------|
-| **Language** | Python | 3.8+ |
-| **Web Framework** | FastAPI | 0.95+ |
-| **Data Processing** | Pandas | 2.0+ |
-| **ORM** | SQLAlchemy | 2.0+ |
-| **Database** | SQLite / PostgreSQL | - |
-| **Validation** | Pydantic | 2.0+ |
-| **Testing** | Pytest | 7.0+ |
-| **ASGI Server** | Uvicorn | 0.20+ |
-| **Code Quality** | Black, isort, Flake8 | - |
+| **Language** | Python | 3.11 |
+| **Web Framework** | FastAPI | 0.115+ |
+| **Data Validation** | Pydantic | 2.0+ |
+| **Vector Database** | ChromaDB | 0.5+ |
+| **LLM Framework** | LangChain | 0.3+ |
+| **Embeddings** | HuggingFace `all-MiniLM-L6-v2` | - |
+| **Testing** | Pytest, HTTPX | 7.0+ |
+| **Containerization** | Docker, Docker Compose | - |
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
 ```plaintext
-real-time-pipeline/
+ai-it-ops-assistant/
 │
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                # FastAPI application entry point
-│   ├── config.py              # Configuration settings (pydantic-settings)
+│   ├── main.py                 # Application entry point
 │   │
-│   ├── api/
+│   ├── api/                    # Route handlers & endpoints
 │   │   ├── __init__.py
-│   │   └── endpoints.py       # REST API route definitions
+│   │   └── routes.py
 │   │
-│   ├── etl/
+│   ├── config/                 # Environment & metric threshold configuration
 │   │   ├── __init__.py
-│   │   └── pipeline.py        # ETL logic: ingestion, validation, transformation, load
+│   │   └── settings.py
 │   │
-│   └── models/
+│   ├── engine/                 # Anomaly & rule evaluation engine
+│   │   ├── __init__.py
+│   │   └── rules.py
+│   │
+│   ├── models/                 # Pydantic data schemas
+│   │   ├── __init__.py
+│   │   ├── telemetry.py
+│   │   └── incident.py
+│   │
+│   ├── rag/                    # Vector database & runbook search
+│   │   ├── __init__.py
+│   │   ├── vector_store.py
+│   │   └── retriever.py
+│   │
+│   └── services/               # Incident report synthesizer
 │       ├── __init__.py
-│       └── database.py        # SQLAlchemy models & session management
+│       └── synthesizer.py
 │
 ├── data/
-│   └── pipeline.db            # SQLite database file (created at runtime)
+│   ├── runbooks/               # Operational Markdown runbooks
+│   │   ├── disk_and_webserver.md
+│   │   └── network_issues.md
+│   └── telemetry_samples/      # Sample payloads for testing
+│       └── sample_payload.json
 │
-├── tests/
+├── tests/                      # Automated test suite
 │   ├── __init__.py
-│   ├── test_api.py            # API endpoint tests
-│   └── test_pipeline.py       # ETL pipeline integration tests
+│   ├── test_engine.py
+│   ├── test_rag.py
+│   └── test_api.py
 │
-├── .env.example               # Environment variables template
+├── .env.example                # Environment variables template
 ├── .gitignore
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
-├── requirements-dev.txt       # Dev dependencies (testing, linting)
-├── pyproject.toml             # Black/isort configuration
+├── pyproject.toml              # Black/isort configuration
 └── README.md
 ```
 
@@ -181,34 +210,34 @@ real-time-pipeline/
 
 ### Prerequisites
 
-- **Python** 3.8 or higher
+- **Python** 3.11 or higher
 - **pip** (Python package manager)
 - **Git** (for cloning)
-- (Optional) **PostgreSQL** for production use
+- (Optional) **Docker Desktop** for containerized execution
 
-### Installation
+### Local Setup
 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/Baqir110/real-time-pipeline.git
-   cd real-time-pipeline
+   git clone https://github.com/YOUR_USERNAME/ai-it-ops-assistant.git
+   cd ai-it-ops-assistant
    ```
 
 2. **Create and activate a virtual environment**
 
    ```bash
-   python -m venv venv
+   python -m venv .venv
    ```
 
    **Windows (PowerShell):**
    ```powershell
-   .\venv\Scripts\Activate.ps1
+   .\.venv\Scripts\Activate.ps1
    ```
 
    **macOS / Linux:**
    ```bash
-   source venv/bin/activate
+   source .venv/bin/activate
    ```
 
 3. **Install dependencies**
@@ -218,187 +247,158 @@ real-time-pipeline/
    pip install -r requirements.txt
    ```
 
-   (Optional) Install development dependencies:
-   ```bash
-   pip install -r requirements-dev.txt
-   ```
-
 4. **Configure environment** (optional)
 
-   Copy `.env.example` to `.env` and adjust settings such as `DATABASE_URL` or `API_TIMEOUT`.
-
-### Running the Application
-
-1. **Run tests** (optional but recommended)
-
    ```bash
-   python -m pytest -v
+   cp .env.example .env
    ```
 
-2. **Start the application server**
+   Edit `.env` to adjust thresholds (e.g., `CPU_THRESHOLD_HIGH=85.0`).
+
+5. **Run the API server**
 
    ```bash
-   python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   python -m app.main
    ```
 
-3. **Access the API**
+   The interactive API documentation will be available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-   - **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
-   - **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+### Running with Docker
+
+```bash
+docker compose up --build
+```
+
+The API will be exposed on port `8000` as defined in the `docker-compose.yml`.
 
 ---
 
 ## ⚙️ Configuration
 
-The application uses environment variables (loaded from `.env` if present) for configuration. Key variables:
+The system uses environment variables (loaded from `.env` if present) for runtime configuration:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | Connection string for SQLAlchemy | `sqlite:///./data/pipeline.db` |
-| `API_BASE_URL` | External data source URL | `https://jsonplaceholder.typicode.com/users` |
-| `REQUEST_TIMEOUT` | HTTP request timeout (seconds) | `10` |
-| `LOG_LEVEL` | Logging level (DEBUG, INFO, WARNING, ERROR) | `INFO` |
-| `ETL_BATCH_SIZE` | Number of records processed per batch | `100` |
-
-For production use, set `DATABASE_URL` to a PostgreSQL instance (e.g., `postgresql://user:pass@localhost/dbname`).
-
----
-
-## 📚 API Reference
-
-### `POST /api/v1/trigger-etl`
-
-**Description**: Triggers the live ETL cycle — fetches external data, performs validation and transformation, and persists aggregated metrics to the database.
-
-**Endpoint**: `POST /api/v1/trigger-etl`
-
-**Request Body**: None
-
-**Success Response (200)**:
-```json
-{
-  "status": "success",
-  "timestamp": "2026-08-16T21:57:48.123456",
-  "records_processed": 10,
-  "unique_domains": 8,
-  "message": "ETL pipeline executed successfully"
-}
-```
-
-**Error Response (500)**:
-```json
-{
-  "status": "error",
-  "timestamp": "2026-08-16T21:57:48.123456",
-  "message": "Failed to fetch external data: Connection timeout"
-}
-```
+| `CPU_THRESHOLD_HIGH` | CPU utilization percentage for HIGH severity | `85.0` |
+| `CPU_THRESHOLD_CRITICAL` | CPU utilization percentage for CRITICAL severity | `95.0` |
+| `RAM_THRESHOLD_HIGH` | RAM utilization percentage for HIGH severity | `80.0` |
+| `DISK_THRESHOLD_CRITICAL` | Disk utilization percentage for CRITICAL severity | `90.0` |
+| `VECTOR_STORE_PATH` | Path to ChromaDB persistence directory | `./data/vector_store` |
+| `RUNBOOKS_PATH` | Path to the Markdown runbooks directory | `./data/runbooks` |
+| `EMBEDDING_MODEL` | HuggingFace embedding model name | `all-MiniLM-L6-v2` |
+| `TOP_K_RESULTS` | Number of runbooks to retrieve | `3` |
 
 ---
 
-### `GET /api/v1/metrics`
+## 📊 Sample Payload & Output
 
-**Description**: Retrieves all aggregated analytical metrics stored in the pipeline database.
+### Request
 
-**Endpoint**: `GET /api/v1/metrics`
+**POST** `/api/v1/telemetry/analyze`
 
-**Query Parameters**:
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `limit` | integer | No | Maximum number of records to return (default: 100, max: 1000) |
-| `status` | string | No | Filter by status (e.g., `SUCCESS`, `FAILED`) |
-| `from_date` | datetime | No | ISO-8601 timestamp (e.g., `2026-08-01T00:00:00`) |
-| `to_date` | datetime | No | ISO-8601 timestamp |
-
-**Success Response (200)**:
 ```json
 {
-  "status": "success",
-  "count": 2,
-  "limit": 100,
-  "data": [
+  "cpu_percent": 94.0,
+  "ram_percent": 91.0,
+  "disk_percent": 97.0,
+  "services": { "apache2": "DOWN" },
+  "http_endpoints": { "https://app.internal/health": 503 }
+}
+```
+
+### Response
+
+```json
+{
+  "incident_title": "Incident: Infrastructure Degradation (High CPU utilization: 94.0%, High RAM utilization: 91.0%)",
+  "severity": "CRITICAL",
+  "likely_cause": "Detected 5 system anomaly/anomalies: High CPU utilization: 94.0%; High RAM utilization: 91.0%; Critical Disk utilization: 97.0%; Service outage: apache2 is DOWN; Endpoint failure: https://app.internal/health returned HTTP 503.",
+  "recommended_actions": [
+    "Inspect system and application logs under /var/log for critical errors.",
+    "Verify process states and resource consumption using system diagnostic tools.",
+    "Identify and remove/rotate large log files to free up disk capacity.",
+    "Attempt service restart for: apache2"
+  ],
+  "escalation_required": true,
+  "escalation_criteria": "Escalate to On-Call Infrastructure Team if service recovery fails after automated actions or disk usage remains >95%.",
+  "sources_consulted": [
     {
-      "id": 1,
-      "metric_name": "total_records_ingested",
-      "value": 10.0,
-      "status": "SUCCESS",
-      "timestamp": "2026-08-16T21:57:48.123456"
-    },
-    {
-      "id": 2,
-      "metric_name": "unique_domains_extracted",
-      "value": 8.0,
-      "status": "SUCCESS",
-      "timestamp": "2026-08-16T21:57:48.123456"
+      "title": "disk_and_webserver.md",
+      "file_path": "data/runbooks/disk_and_webserver.md",
+      "relevance_score": 0.58
     }
   ]
 }
+```
+
+### cURL Example
+
+```bash
+curl -X POST http://localhost:8000/api/v1/telemetry/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cpu_percent": 94.0,
+    "ram_percent": 91.0,
+    "disk_percent": 97.0,
+    "services": {"apache2": "DOWN"},
+    "http_endpoints": {"https://app.internal/health": 503}
+  }'
 ```
 
 ---
 
 ## 🧪 Testing
 
-The project includes comprehensive test coverage using `pytest` and `pytest-cov`.
+The project includes a comprehensive test suite using `pytest` and `httpx`.
 
 ```bash
 # Run all tests with verbose output
-python -m pytest -v
+pytest -v
 
 # Run specific test file
-python -m pytest tests/test_api.py -v
+pytest tests/test_engine.py -v
 
 # Run tests with coverage report
-python -m pytest --cov=app --cov-report=html
+pytest --cov=app --cov-report=html
 
 # Run linting (if configured)
 black --check app/ tests/
 isort --check-only app/ tests/
-flake8 app/ tests/
 ```
 
 ---
 
-## 📊 Monitoring & Logging
+## 📊 Monitoring & Observability
 
-- **Logging**: Structured logging using Python's `logging` module with configurable levels. Logs include timestamps, module names, and contextual data.
-- **Health Check**: A `/health` endpoint is available to verify API and database connectivity.
-- **Metrics**: The API exposes Prometheus-compatible metrics via the `/metrics` endpoint (if you enable `prometheus-client`).
+- **Health Check**: The API provides a `/health` endpoint for liveness and readiness probes.
+- **Structured Logging**: Logs are output in JSON format for easy ingestion into logging stacks (ELK, Splunk).
+- **OpenTelemetry Integration**: (Planned) Distributed tracing support for performance analysis.
 
 ---
 
 ## 🚢 Deployment
 
-### Docker
-
-A `Dockerfile` and `docker-compose.yml` are provided for containerized deployment.
-
-```bash
-# Build and run with Docker Compose
-docker-compose up --build
-```
-
-### Kubernetes (example)
-
-A sample Kubernetes deployment manifest is available in the `deploy/` directory.
-
 ### Production Considerations
 
-- Use PostgreSQL with connection pooling.
-- Set `LOG_LEVEL=WARNING` in production.
-- Enable HTTPS via a reverse proxy (e.g., Nginx).
-- Use environment variables to manage secrets (database credentials).
+1. **Scale Vector Store**: For large runbook collections, consider using a remote ChromaDB instance or migrating to Pinecone/Weaviate.
+2. **Embedding Cache**: Cache embeddings to reduce inference time on repeated queries.
+3. **API Security**: Add authentication (JWT or API keys) and rate limiting for production endpoints.
+4. **Database Backend**: Replace the local ChromaDB with a persistent remote store.
+
+### Kubernetes Deployment
+
+A sample Kubernetes manifest is available in the `deploy/` directory. Use the provided Docker image with your preferred registry.
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] Add Alembic for database migrations.
-- [ ] Integrate a scheduler (APScheduler) for periodic ETL runs.
-- [ ] Add support for multiple data sources (CSV, Parquet, S3).
-- [ ] Implement caching (Redis) for frequently accessed metrics.
-- [ ] Add data quality alerts and notifications.
-- [ ] Build a simple dashboard (e.g., with Streamlit) to visualize metrics.
+- [ ] Add **LLM-augmented generation** (e.g., GPT‑4, Mistral) for more fluent incident summaries.
+- [ ] Integrate **Slack/Teams** alerting for incident notifications.
+- [ ] Implement **time‑series anomaly detection** (e.g., Prophet, statistical models).
+- [ ] Add **self‑healing actions** via Ansible or Terraform.
+- [ ] Support for **multi‑tenant** configurations.
+- [ ] Web‑based dashboard for historical incident analysis.
 
 ---
 
@@ -417,15 +417,20 @@ Contributions are welcome! Please follow these steps:
 - Follow **PEP 8** style guidelines.
 - Write **docstrings** for all functions and classes.
 - Add **unit tests** for new functionality.
-- Ensure all tests and linting pass before submitting a PR.
+- Ensure all tests pass before submitting a PR.
 
 ---
 
+## 📄 License
+
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+
+---
 
 ## 📧 Contact
 
 **Author**: Muhammad Baqir  
-**GitHub**: [github.com/Baqir110](https://github.com/Baqir110)  
+**GitHub**: [github.com/YOUR_USERNAME](https://github.com/baqir110)  
 **LinkedIn**: [Muhammad Baqir](https://linkedin.com/in/muhammad-baqir-it)
 
 ---
