@@ -11,7 +11,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Use Cases](#use-cases)
@@ -21,9 +21,10 @@
 - [Repository Structure](#repository-structure)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Local Setup](#local-setup)
-  - [Running with Docker](#running-with-docker)
+  - [Quick Start with Docker](#quick-start-with-docker)
+  - [Local Development](#local-development)
 - [Configuration](#configuration)
+- [Local Dashboard Access](#local-dashboard-access)
 - [Sample Payload & Output](#sample-payload--output)
 - [Testing](#testing)
 - [Monitoring & Observability](#monitoring--observability)
@@ -35,31 +36,31 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
-An **automated AIOps incident triage engine** built with FastAPI, LangChain, ChromaDB, and Pydantic. The platform ingests real-time infrastructure telemetry (CPU, RAM, Disk, process health, HTTP status), identifies active system anomalies, and performs vector similarity search against operational runbooks to synthesize structured incident reports.
+An **automated AIOps incident triage engine** built with FastAPI, LangChain, ChromaDB, and Pydantic. It ingests real‑time infrastructure telemetry (CPU, RAM, disk, process health, HTTP status), detects system anomalies, and runs a vector similarity search against operational runbooks to produce structured incident reports.
 
-This system transforms raw infrastructure metrics into actionable intelligence, reducing Mean Time to Detection (MTTD) and Mean Time to Resolution (MTTR) by automating the initial incident analysis and remediation recommendation process.
+The service helps reduce Mean Time to Detection (MTTD) and Mean Time to Resolution (MTTR) by automating the initial analysis and providing actionable recommendations.
 
-**Key Differentiators**:
+**Key differentiators**:
 - **Zero‑configuration RAG**: Pre‑indexed runbook knowledge base with embeddings for instant retrieval.
-- **Strongly Typed Incident Reports**: Pydantic‑enforced schemas ensure consistent output for downstream automation.
-- **Container‑Native**: Full Docker support with a lightweight Python 3.11 base image.
-- **Extensible Rule Engine**: Easily add custom threshold rules and anomaly detection logic.
+- **Strongly typed incident reports**: Pydantic‑enforced schemas for consistent downstream automation.
+- **Container‑native**: Full Docker Compose setup with Prometheus and Grafana integration.
+- **Extensible rule engine**: Add custom threshold rules and anomaly detection logic easily.
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
-- **Infrastructure Monitoring**: Automatically analyze telemetry from servers, containers, or cloud instances.
-- **On‑Call Support**: Provide first‑line incident context and recommended actions to SREs.
-- **Runbook Automation**: Retrieves relevant operational procedures and presents them in a structured format.
-- **AIOps Playground**: A reference implementation for integrating RAG into IT operations workflows.
-- **Self‑Healing Systems**: Feed the structured output into automated remediation pipelines (e.g., Ansible, Kubernetes operators).
+- **Infrastructure monitoring** – analyse telemetry from servers, containers, or cloud instances.
+- **On‑call support** – give SREs immediate incident context and recommended actions.
+- **Runbook automation** – retrieve relevant operational procedures in a structured format.
+- **AIOps playground** – a reference implementation for integrating RAG into IT operations.
+- **Self‑healing systems** – feed structured outputs into automated remediation pipelines (e.g., Ansible, Kubernetes operators).
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart TB
@@ -92,62 +93,47 @@ flowchart TB
     RS --> IR
 ```
 
-### Data Flow
+**Data flow**:
 
 | Stage | Component | Description |
-|-------|-----------|-------------|
-| **Ingestion** | FastAPI Endpoint | Receives telemetry payload via POST `/api/v1/telemetry/analyze`. |
-| **Anomaly Detection** | Rule Engine | Evaluates metrics against defined thresholds; flags violations and service failures. |
-| **Context Retrieval** | ChromaDB + LangChain | Embeds anomaly signatures and retrieves top‑matching runbooks. |
-| **Report Synthesis** | Incident Synthesizer | Combines anomaly data and runbook context into a structured JSON incident report. |
-| **Output** | Incident Report | Returns severity, root cause, recommended actions, escalation path, and sources. |
+| --- | --- | --- |
+| Ingestion | FastAPI Endpoint | Receives telemetry via `POST /api/v1/telemetry/analyze`. |
+| Anomaly detection | Rule Engine | Evaluates metrics against thresholds; flags violations and service failures. |
+| Context retrieval | ChromaDB + LangChain | Embeds anomalies and retrieves matching runbooks. |
+| Report synthesis | Incident Synthesizer | Combines anomalies and runbook context into a structured JSON report. |
+| Output | Incident Report | Returns severity, root cause, recommended actions, escalation, and sources. |
 
 ---
 
-## ⚡ Key Features
+## Key Features
 
-### 🔍 Automated Anomaly Detection
-- Monitors **CPU, RAM, Disk, service health**, and **HTTP endpoints**.
-- Configurable threshold rules (e.g., CPU > 90% triggers a **HIGH** severity alert).
-- Flags both threshold violations and service failures instantly.
-
-### 📚 RAG-Powered Runbook Retrieval
-- Embeds anomaly signatures using `all-MiniLM-L6-v2` via HuggingFace Transformers.
-- Stores and retrieves operational runbooks using **ChromaDB** vector store.
-- Returns the most relevant procedures with similarity scores for transparency.
-
-### 📋 Structured Incident Reports
-- Strongly typed schemas using **Pydantic v2**.
-- Includes: incident title, severity, likely cause, recommended actions, escalation criteria, and sources consulted.
-- Predictable, machine‑readable output for integration with ticketing systems (Jira, ServiceNow) or automation tools.
-
-### 🐳 Container‑Ready
-- Optimized Dockerfile with multi‑stage builds.
-- `docker-compose` support for local development and testing.
-- Minimal dependencies for a lightweight footprint.
-
-### 🧪 Test Coverage
-- Comprehensive `pytest` suite covering the rule engine, RAG retrieval, and API endpoints.
-- Sample telemetry payloads provided for manual testing.
+* **Automated anomaly detection** – monitors CPU, RAM, disk, services, and HTTP endpoints with configurable thresholds.
+* **RAG‑powered runbook retrieval** – embeds anomalies using `all-MiniLM-L6-v2` (HuggingFace) and retrieves relevant procedures via ChromaDB.
+* **Structured incident reports** – strongly typed (Pydantic v2) reports include title, severity, likely cause, recommended actions, escalation criteria, and sources consulted.
+* **Container‑ready & monitored** – multi‑service Docker Compose setup (API, PostgreSQL, Redis, Prometheus, Grafana) with an automated Grafana setup script.
+* **Test coverage** – comprehensive `pytest` suite covering the rule engine, RAG retrieval, and API endpoints.
+* **External HTTP health checks** – uses `httpx` to verify downstream service availability.
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Category | Technology | Version |
-|----------|------------|---------|
-| **Language** | Python | 3.11 |
-| **Web Framework** | FastAPI | 0.115+ |
-| **Data Validation** | Pydantic | 2.0+ |
-| **Vector Database** | ChromaDB | 0.5+ |
-| **LLM Framework** | LangChain | 0.3+ |
-| **Embeddings** | HuggingFace `all-MiniLM-L6-v2` | - |
-| **Testing** | Pytest, HTTPX | 7.0+ |
-| **Containerization** | Docker, Docker Compose | - |
+| --- | --- | --- |
+| Language | Python | 3.11+ / 3.13 |
+| Web Framework | FastAPI | 0.115+ |
+| Data Validation | Pydantic | 2.0+ |
+| Vector Database | ChromaDB | 0.5+ |
+| LLM Framework | LangChain | 0.3+ |
+| Embeddings | HuggingFace `all-MiniLM-L6-v2` | - |
+| Database & Cache | PostgreSQL, Redis | - |
+| Monitoring | Prometheus, Grafana | - |
+| Testing | Pytest, HTTPX | 7.0+ |
+| Containerization | Docker, Docker Compose | - |
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```plaintext
 ai-it-ops-assistant/
@@ -189,6 +175,9 @@ ai-it-ops-assistant/
 │   └── telemetry_samples/      # Sample payloads for testing
 │       └── sample_payload.json
 │
+├── prometheus/
+│   └── prometheus.yml          # Prometheus scrape configuration
+│
 ├── tests/                      # Automated test suite
 │   ├── __init__.py
 │   ├── test_engine.py
@@ -199,102 +188,125 @@ ai-it-ops-assistant/
 ├── .gitignore
 ├── Dockerfile
 ├── docker-compose.yml
+├── pyproject.toml              # Project and linter configuration
 ├── requirements.txt
-├── pyproject.toml              # Black/isort configuration
+├── setup-grafana.ps1           # Windows Grafana setup script
+├── setup-grafana.sh            # Linux/macOS Grafana setup script
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Python** 3.11 or higher
-- **pip** (Python package manager)
-- **Git** (for cloning)
-- (Optional) **Docker Desktop** for containerized execution
+* Python 3.11 or higher (Python 3.13 is also supported)
+* `pip` and `git`
+* (Optional) Docker Desktop for containerised execution
 
-### Local Setup
+### Quick Start with Docker
 
-1. **Clone the repository**
+Run all services with Docker Compose:
 
-   ```bash
-   git clone https://github.com/baqir110/ai-it-ops-assistant.git
-   cd ai-it-ops-assistant
-   ```
-
-2. **Create and activate a virtual environment**
-
-   ```bash
-   python -m venv .venv
-   ```
-
-   **Windows (PowerShell):**
-   ```powershell
-   .\.venv\Scripts\Activate.ps1
-   ```
-
-   **macOS / Linux:**
-   ```bash
-   source .venv/bin/activate
-   ```
-
-3. **Install dependencies**
-
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment** (optional)
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Edit `.env` to adjust thresholds (e.g., `CPU_THRESHOLD_HIGH=85.0`).
-
-5. **Run the API server**
-
-   ```bash
-   python -m app.main
-   ```
-
-   The interactive API documentation will be available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
-
-### Running with Docker
-
+1. **Set up environment variables**:
+Copy `.env.example` to `.env` in the project root:
 ```bash
-docker compose up --build
+cp .env.example .env
+```
+Fill in your configuration details inside `.env`:
+```env
+OPENAI_API_KEY=your_openai_api_key_here   # Optional – only for LLM‑augmented summaries
+CPU_THRESHOLD_HIGH=85.0
+CPU_THRESHOLD_CRITICAL=95.0
+RAM_THRESHOLD_HIGH=80.0
+DISK_THRESHOLD_CRITICAL=90.0
+VECTOR_STORE_PATH=./data/vector_store
+RUNBOOKS_PATH=./data/runbooks
+EMBEDDING_MODEL=all-MiniLM-L6-v2
+TOP_K_RESULTS=3
 ```
 
-The API will be exposed on port `8000` as defined in the `docker-compose.yml`.
+2. **Start the stack**:
+```bash
+docker compose up -d
+```
+
+3. **Check logs** (optional):
+```bash
+docker compose logs -f
+```
+
+4. **Automatically configure Grafana** (optional):
+- Windows: `.\setup-grafana.ps1`
+- Linux/macOS: `./setup-grafana.sh`
+
+### Local Development (without Docker)
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/baqir110/ai-it-ops-assistant.git
+cd ai-it-ops-assistant
+```
+
+2. **Create and activate a virtual environment**:
+```bash
+python -m venv .venv
+```
+- Windows (PowerShell): `.\.venv\Scripts\Activate.ps1`
+- Linux / macOS: `source .venv/bin/activate`
+
+3. **Install dependencies**:
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+4. **Run the API server**:
+```bash
+uvicorn app.main:app --reload
+```
+
+Interactive Swagger docs are available at `http://127.0.0.1:8000/docs`.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-The system uses environment variables (loaded from `.env` if present) for runtime configuration:
+Runtime settings are managed via environment variables in `.env`:
 
 | Variable | Description | Default |
-|----------|-------------|---------|
-| `CPU_THRESHOLD_HIGH` | CPU utilization percentage for HIGH severity | `85.0` |
-| `CPU_THRESHOLD_CRITICAL` | CPU utilization percentage for CRITICAL severity | `95.0` |
-| `RAM_THRESHOLD_HIGH` | RAM utilization percentage for HIGH severity | `80.0` |
-| `DISK_THRESHOLD_CRITICAL` | Disk utilization percentage for CRITICAL severity | `90.0` |
-| `VECTOR_STORE_PATH` | Path to ChromaDB persistence directory | `./data/vector_store` |
-| `RUNBOOKS_PATH` | Path to the Markdown runbooks directory | `./data/runbooks` |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | **Optional** – required only if you enable LLM‑augmented summaries; the rule‑based synthesizer works without it. | (empty) |
+| `CPU_THRESHOLD_HIGH` | CPU % for HIGH alert | `85.0` |
+| `CPU_THRESHOLD_CRITICAL` | CPU % for CRITICAL alert | `95.0` |
+| `RAM_THRESHOLD_HIGH` | RAM % for HIGH alert | `80.0` |
+| `DISK_THRESHOLD_CRITICAL` | Disk % for CRITICAL alert | `90.0` |
+| `VECTOR_STORE_PATH` | ChromaDB persistence directory | `./data/vector_store` |
+| `RUNBOOKS_PATH` | Directory containing Markdown runbooks | `./data/runbooks` |
 | `EMBEDDING_MODEL` | HuggingFace embedding model name | `all-MiniLM-L6-v2` |
 | `TOP_K_RESULTS` | Number of runbooks to retrieve | `3` |
 
 ---
 
-## 📊 Sample Payload & Output
+## Local Dashboard Access
 
-### Request
+| Service | Access URL | Default Credentials |
+| --- | --- | --- |
+| **Swagger UI Docs** | [http://localhost:8000/docs](http://localhost:8000/docs) | None |
+| **ReDoc UI Docs** | [http://localhost:8000/redoc](http://localhost:8000/redoc) | None |
+| **Prometheus Web UI** | [http://localhost:9090](http://localhost:9090) | None |
+| **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | `admin` / `admin` (change on first login) |
+| **PostgreSQL Database** | `localhost:5432` | Configured in `.env` |
+| **Redis Cache** | `localhost:6379` | None |
 
-**POST** `/api/v1/telemetry/analyze`
+> **Note**: Grafana credentials can be overridden using environment variables; see the `docker-compose.yml` for details.
+
+---
+
+## Sample Payload & Output
+
+**Request** – `POST /api/v1/telemetry/analyze`
 
 ```json
 {
@@ -306,7 +318,7 @@ The system uses environment variables (loaded from `.env` if present) for runtim
 }
 ```
 
-### Response
+**Response**:
 
 ```json
 {
@@ -331,108 +343,73 @@ The system uses environment variables (loaded from `.env` if present) for runtim
 }
 ```
 
-### cURL Example
-
-```bash
-curl -X POST http://localhost:8000/api/v1/telemetry/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cpu_percent": 94.0,
-    "ram_percent": 91.0,
-    "disk_percent": 97.0,
-    "services": {"apache2": "DOWN"},
-    "http_endpoints": {"https://app.internal/health": 503}
-  }'
-```
-
 ---
 
-## 🧪 Testing
+## Testing
 
-The project includes a comprehensive test suite using `pytest` and `httpx`.
+Execute the test suite using `pytest`:
 
 ```bash
-# Run all tests with verbose output
+# Run all tests
+pytest
+
+# With verbose output
 pytest -v
 
-# Run specific test file
+# Run only engine tests
 pytest tests/test_engine.py -v
-
-# Run tests with coverage report
-pytest --cov=app --cov-report=html
-
-# Run linting (if configured)
-black --check app/ tests/
-isort --check-only app/ tests/
 ```
 
 ---
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
-- **Health Check**: The API provides a `/health` endpoint for liveness and readiness probes.
-- **Structured Logging**: Logs are output in JSON format for easy ingestion into logging stacks (ELK, Splunk).
-- **OpenTelemetry Integration**: (Planned) Distributed tracing support for performance analysis.
-
----
-
-## 🚢 Deployment
-
-### Production Considerations
-
-1. **Scale Vector Store**: For large runbook collections, consider using a remote ChromaDB instance or migrating to Pinecone/Weaviate.
-2. **Embedding Cache**: Cache embeddings to reduce inference time on repeated queries.
-3. **API Security**: Add authentication (JWT or API keys) and rate limiting for production endpoints.
-4. **Database Backend**: Replace the local ChromaDB with a persistent remote store.
-
-### Kubernetes Deployment
-
-A sample Kubernetes manifest is available in the `deploy/` directory. Use the provided Docker image with your preferred registry.
+* **Prometheus metrics** – a scraping endpoint is configured for operational metrics.
+* **Grafana dashboards** – setup scripts are provided (Windows and Linux/macOS) to pre‑configure dashboards.
+* **Health checks** – the API includes a `/health` endpoint for container liveness probes.
 
 ---
 
-## 🗺️ Roadmap
+## Deployment
 
-- [ ] Add **LLM-augmented generation** (e.g., GPT‑4, Mistral) for more fluent incident summaries.
-- [ ] Integrate **Slack/Teams** alerting for incident notifications.
-- [ ] Implement **time‑series anomaly detection** (e.g., Prophet, statistical models).
-- [ ] Add **self‑healing actions** via Ansible or Terraform.
-- [ ] Support for **multi‑tenant** configurations.
-- [ ] Web‑based dashboard for historical incident analysis.
+* **Persistent vector database** – attach dedicated storage volumes for ChromaDB in production.
+* **Security & secrets** – use environment variables for secrets and terminate HTTPS via a reverse proxy.
+* **Container orchestration** – deploy with Docker Compose or adapt the Kubernetes manifests (if added).
 
 ---
 
-## 🤝 Contributing
+## Roadmap
 
-Contributions are welcome! Please follow these steps:
+* [ ] LLM‑augmented incident summary generation (fluent, human‑like text).
+* [ ] Slack / Teams alerting via webhooks.
+* [ ] Automated remediation playbooks (Ansible / Kubernetes).
+* [ ] Web UI (Streamlit or React) to submit telemetry and visualize incident history.
+
+---
+
+## Contributing
 
 1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/amazing-feature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/amazing-feature`).
+2. Create a feature branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
 5. Open a Pull Request.
 
-### Development Guidelines
+---
 
-- Follow **PEP 8** style guidelines.
-- Write **docstrings** for all functions and classes.
-- Add **unit tests** for new functionality.
-- Ensure all tests pass before submitting a PR.
+## License
+
+Distributed under the MIT License.
 
 ---
 
-## 📧 Contact
+## Contact
 
 **Author**: Muhammad Baqir  
-**GitHub**: [github.com/baqir110](https://github.com/baqir110)  
-**LinkedIn**: [Muhammad Baqir](https://linkedin.com/in/muhammad-baqir-it)
+**GitHub**: [github.com/baqir110](https://github.com/baqir110)
 
 ---
 
 <p align="center">
-  Made with ❤️ and 🐍 Python
-</p>
-
-<p align="center">
-  ⭐ Star this repository if you find it useful!
+  Built with ❤️ and 🐍 Python
 </p>
