@@ -65,7 +65,7 @@ jobs:
 
       - name: Run Pytest Suite
         env:
-          DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/it_ops_db
+          DATABASE_URL: postgresql+psycopg://postgres:postgrespassword@localhost:5432/it_ops_db
           REDIS_URL: redis://localhost:6379/0
           SECRET_KEY: test-secret-key-for-ci
           VECTOR_STORE_PATH: ./data/vector_store
