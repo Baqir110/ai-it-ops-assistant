@@ -16,9 +16,7 @@ COLLECTION_NAME = "it_ops_runbooks"
 
 class RunbookSearchEngine:
     def __init__(self):
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2"
-        )
+        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         self.vector_store = None
         self.initialize_vector_store()
 

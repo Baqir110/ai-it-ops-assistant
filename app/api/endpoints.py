@@ -106,5 +106,3 @@ def get_incidents(
         "value": incidents,
         "Count": len(incidents),
     }
-
-

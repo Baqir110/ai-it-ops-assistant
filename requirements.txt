@@ -12,8 +12,14 @@ langchain-community
 langchain-huggingface
 langchain-chroma
 pytest
-httpx
+httpx==0.28.1
 openai
-
 prometheus-client
 psycopg[binary]
+email-validator
+pwdlib[bcrypt]
+browser-use==0.12.6
+aiohttp==3.13.3
+click==8.3.1
+huggingface-hub<1.27.0
+kubernetes<36.0.0

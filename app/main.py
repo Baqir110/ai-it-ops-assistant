@@ -3,9 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app
 
 from app.api.endpoints import router as api_router
+from app.api.v1.auth import router as auth_router
 from app.config.settings import settings
+from app.database import Base, engine
+from app.models.user import User  # Registers User model with Base
 from app.monitoring import metrics
 
+# Initialize database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -34,7 +39,9 @@ def health_check():
     }
 
 
+# Include Routers
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")
 
 
 # Prometheus metrics endpoint
