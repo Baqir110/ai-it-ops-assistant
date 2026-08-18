@@ -1,3 +1,6 @@
+---
+
+```markdown
 # AI-Powered IT Operations Assistant
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -22,6 +25,7 @@
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Quick Start with Docker](#quick-start-with-docker)
+  - [Building the Docker Image](#building-the-docker-image)
   - [Local Development](#local-development)
 - [Configuration](#configuration)
 - [Local Dashboard Access](#local-dashboard-access)
@@ -231,6 +235,10 @@ TOP_K_RESULTS=3
 ```bash
 docker compose up -d
 ```
+This automatically builds the API image if it doesn't exist. To force a rebuild:
+```bash
+docker compose up --build -d
+```
 
 3. **Check logs** (optional):
 ```bash
@@ -240,6 +248,22 @@ docker compose logs -f
 4. **Automatically configure Grafana** (optional):
 - Windows: `.\setup-grafana.ps1`
 - Linux/macOS: `./setup-grafana.sh`
+
+### Building the Docker Image
+
+If you prefer to build only the API image and run it separately (e.g., for custom orchestration), use:
+
+```bash
+docker build -t ai-it-ops:latest .
+```
+
+You can then run the container with:
+
+```bash
+docker run -d -p 8000:8000 --env-file .env ai-it-ops:latest
+```
+
+This will start the API service without the auxiliary containers (PostgreSQL, Redis, Prometheus, Grafana). For full monitoring stack, continue using Docker Compose.
 
 ### Local Development (without Docker)
 
@@ -413,3 +437,7 @@ Distributed under the MIT License.
 <p align="center">
   Built with ❤️ and 🐍 Python
 </p>
+```
+
+---
+
