@@ -1,6 +1,3 @@
----
-
-```markdown
 # AI-Powered IT Operations Assistant
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -437,7 +434,7 @@ Distributed under the MIT License.
 <p align="center">
   Built with ❤️ and 🐍 Python
 </p>
-```
+
 
 ---
 
