@@ -2,9 +2,15 @@ import os
 import json
 from typing import List
 from openai import OpenAI
-from app.models.schemas import SystemTelemetry, IncidentReport, SeverityLevel, RunbookSource
+from app.models.schemas import (
+    SystemTelemetry,
+    IncidentReport,
+    SeverityLevel,
+    RunbookSource,
+)
 from app.engine.anomaly_detector import AnomalyDetector
 from app.rag.runbook_search import RunbookSearchEngine
+
 
 class IncidentSynthesizer:
     def __init__(self):
@@ -16,7 +22,7 @@ class IncidentSynthesizer:
     def analyze_telemetry(self, telemetry: SystemTelemetry) -> IncidentReport:
         # 1. Evaluate metrics against threshold rules
         detection = self.detector.evaluate(telemetry)
-        
+
         # Healthy system branch
         if not detection["has_anomalies"]:
             return IncidentReport(
@@ -26,7 +32,7 @@ class IncidentSynthesizer:
                 recommended_actions=["Continue routine telemetry monitoring."],
                 escalation_required=False,
                 escalation_criteria=None,
-                sources_consulted=[]
+                sources_consulted=[],
             )
 
         # 2. Retrieve relevant runbooks via vector search
@@ -36,9 +42,9 @@ class IncidentSynthesizer:
         # 3. Use OpenAI Structured Outputs if API Key is available
         if self.client:
             try:
-                runbook_context = "\n\n".join([
-                    f"--- Runbook: {s.title} ---\n{s.file_path}" for s in sources
-                ])
+                runbook_context = "\n\n".join(
+                    [f"--- Runbook: {s.title} ---\n{s.file_path}" for s in sources]
+                )
 
                 prompt = f"""
                 Analyze the following active system anomalies and generate an SRE incident report using the provided runbook context.
@@ -55,14 +61,14 @@ class IncidentSynthesizer:
                     messages=[
                         {
                             "role": "system",
-                            "content": "You are a Senior SRE Incident Commander synthesizing telemetry anomalies and runbook knowledge."
+                            "content": "You are a Senior SRE Incident Commander synthesizing telemetry anomalies and runbook knowledge.",
                         },
-                        {"role": "user", "content": prompt}
+                        {"role": "user", "content": prompt},
                     ],
                     response_format=IncidentReport,
-                    temperature=0.2
+                    temperature=0.2,
                 )
-                
+
                 report = completion.choices[0].message.parsed
                 report.sources_consulted = sources
                 return report
@@ -79,8 +85,12 @@ class IncidentSynthesizer:
         severity = SeverityLevel.MEDIUM
         if telemetry.disk_percent >= 95.0 or telemetry.cpu_percent >= 95.0:
             severity = SeverityLevel.HIGH
-        
-        down_services = [svc for svc, status in telemetry.services.items() if status.upper() in ["DOWN", "FAILED"]]
+
+        down_services = [
+            svc
+            for svc, status in telemetry.services.items()
+            if status.upper() in ["DOWN", "FAILED"]
+        ]
         if down_services and telemetry.disk_percent >= 90.0:
             severity = SeverityLevel.CRITICAL
 
@@ -91,17 +101,20 @@ class IncidentSynthesizer:
             "Inspect system and application logs under /var/log for critical errors.",
             "Verify process states and resource consumption using system diagnostic tools.",
         ]
-        
+
         if telemetry.disk_percent >= 90.0:
-            actions.append("Identify and remove/rotate large log files to free up disk capacity.")
-            
+            actions.append(
+                "Identify and remove/rotate large log files to free up disk capacity."
+            )
+
         for svc in down_services:
             actions.append(f"Attempt service restart for: {svc}")
 
         escalation_required = severity in [SeverityLevel.HIGH, SeverityLevel.CRITICAL]
         escalation_criteria = (
             "Escalate to On-Call Infrastructure Team if service recovery fails after automated actions or disk usage remains >95%."
-            if escalation_required else None
+            if escalation_required
+            else None
         )
 
         return IncidentReport(
@@ -111,5 +124,5 @@ class IncidentSynthesizer:
             recommended_actions=actions,
             escalation_required=escalation_required,
             escalation_criteria=escalation_criteria,
-            sources_consulted=sources
+            sources_consulted=sources,
         )

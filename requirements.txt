@@ -12,4 +12,8 @@ langchain-community
 langchain-huggingface
 langchain-chroma
 pytest
-httpxopenai
+httpx
+openai
+
+prometheus-client
+psycopg[binary]
