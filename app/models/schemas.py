@@ -10,6 +10,11 @@ class SeverityLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class AnalysisMethod(str, Enum):
+    OPENAI = "OPENAI"
+    RULE_BASED = "RULE_BASED"
+
+
 class SystemTelemetry(BaseModel):
     cpu_percent: float = Field(
         ..., ge=0.0, le=100.0, json_schema_extra={"example": 94.0}
@@ -43,3 +48,4 @@ class IncidentReport(BaseModel):
     escalation_required: bool
     escalation_criteria: Optional[str] = None
     sources_consulted: List[RunbookSource] = []
+    analysis_method: AnalysisMethod = AnalysisMethod.RULE_BASED

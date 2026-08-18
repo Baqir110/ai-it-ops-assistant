@@ -17,9 +17,18 @@ from app.monitoring.metrics import (
 )
 from app.services.synthesizer import IncidentSynthesizer
 
-
 router = APIRouter()
-synthesizer = IncidentSynthesizer()
+
+synthesizer = None
+
+
+def get_synthesizer() -> IncidentSynthesizer:
+    global synthesizer
+
+    if synthesizer is None:
+        synthesizer = IncidentSynthesizer()
+
+    return synthesizer
 
 
 @router.post(
@@ -33,7 +42,7 @@ synthesizer = IncidentSynthesizer()
         "persists the generated incident, and returns structured incident analysis."
     ),
 )
-async def analyze_telemetry(
+def analyze_telemetry(
     telemetry: SystemTelemetry,
     db: Session = Depends(get_db),
 ) -> IncidentReport:
@@ -46,9 +55,11 @@ async def analyze_telemetry(
     DISK_USAGE.set(telemetry.disk_percent)
 
     try:
-        report = synthesizer.analyze_telemetry(telemetry)
+        engine = get_synthesizer()
 
-        detection = synthesizer.detector.evaluate(telemetry)
+        report = engine.analyze_telemetry(telemetry)
+
+        detection = engine.detector.evaluate(telemetry)
         anomaly_count = detection["anomaly_count"]
 
         if detection["has_anomalies"]:
@@ -61,9 +72,7 @@ async def analyze_telemetry(
             anomaly_count=anomaly_count,
         )
 
-        INCIDENTS_CREATED.labels(
-            severity=report.severity.value
-        ).inc()
+        INCIDENTS_CREATED.labels(severity=report.severity.value).inc()
 
         return report
 
@@ -88,15 +97,14 @@ def get_incidents(
     db: Session = Depends(get_db),
     limit: int = Query(default=100, ge=1, le=500),
 ):
-    return list_incidents(db, limit=limit)
+    incidents = list_incidents(
+        db,
+        limit=limit,
+    )
 
-
-@router.get(
-    "/health",
-    status_code=status.HTTP_200_OK,
-)
-async def health_check():
     return {
-        "status": "healthy",
-        "service": "AI IT Operations Assistant",
+        "value": incidents,
+        "Count": len(incidents),
     }
+
+

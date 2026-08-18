@@ -5,8 +5,7 @@ from prometheus_client import make_asgi_app
 from app.api.endpoints import router as api_router
 from app.config.settings import settings
 from app.monitoring import metrics
-from app.database.connection import Base, engine
-from app.database import models
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -22,7 +21,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get(
+    "/health",
+    status_code=200,
+    summary="Health check",
+)
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "AI IT Operations Assistant",
+    }
+
+
 app.include_router(api_router, prefix="/api/v1")
+
 
 # Prometheus metrics endpoint
 metrics_app = make_asgi_app()
@@ -32,4 +45,9 @@ app.mount("/metrics", metrics_app)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+    )
