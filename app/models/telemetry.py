@@ -9,7 +9,5 @@ class TelemetryPayload(BaseModel):
     metric_value: float = Field(..., examples=[94.5])
     threshold: float = Field(default=85.0, examples=[80.0])
     status: str = Field(default="ok", examples=["critical"])
-    timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     metadata: Optional[Dict[str, Any]] = None
