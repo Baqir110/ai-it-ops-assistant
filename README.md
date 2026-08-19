@@ -1,18 +1,18 @@
 # AI IT Operations Assistant
 
-An infrastructure-focused AIOps platform for automated telemetry analysis, anomaly detection, runbook retrieval, and incident triage.
+An infrastructure-focused AIOps platform for automated telemetry analysis, anomaly detection, runbook retrieval, incident triage, monitoring, visualization, and alerting.
 
 Built with FastAPI, PostgreSQL, Redis, Prometheus, Grafana, Docker, and Kubernetes, the project demonstrates a production-oriented backend architecture for IT operations and observability workflows.
 
 [![CI](https://github.com/Baqir110/ai-it-ops-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Baqir110/ai-it-ops-assistant/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Redis](https://img.shields.io/badge/Redis-7-DC382D.svg?logo=redis&logoColor=white)](https://redis.io/)
-[![Prometheus](https://img.shields.io/badge/Prometheus-3.5-E6522C.svg?logo=prometheus&logoColor=white)](https://prometheus.io/)
-[![Grafana](https://img.shields.io/badge/Grafana-12.1-F46800.svg?logo=grafana&logoColor=white)](https://grafana.com/)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg?logo=python\&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi\&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1.svg?logo=postgresql\&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D.svg?logo=redis\&logoColor=white)](https://redis.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C.svg?logo=prometheus\&logoColor=white)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-Dashboard%20%26%20Alerting-F46800.svg?logo=grafana\&logoColor=white)](https://grafana.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker\&logoColor=white)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg?logo=kubernetes\&logoColor=white)](https://kubernetes.io/)
 [![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC.svg)](https://pytest.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -22,33 +22,34 @@ Built with FastAPI, PostgreSQL, Redis, Prometheus, Grafana, Docker, and Kubernet
 
 AI IT Operations Assistant analyzes infrastructure telemetry and converts detected operational problems into structured incident reports.
 
-The system accepts signals such as:
+The platform processes signals such as:
 
-- CPU utilization
-- RAM utilization
-- Disk utilization
-- Service availability
-- HTTP endpoint health
-- Operational events
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* Service availability
+* HTTP endpoint health
+* Request latency
+* Operational anomalies
 
-Telemetry is evaluated by a rule-based anomaly detection engine. Detected anomalies can then be correlated with operational runbooks to provide troubleshooting context and recommended actions.
+Telemetry is evaluated by a rule-based anomaly detection engine. Detected anomalies can be correlated with operational runbooks to provide troubleshooting context and recommended actions.
 
-The resulting incident report contains structured information such as:
+The application also exposes Prometheus-compatible metrics. Prometheus collects the metrics, while Grafana provides dashboards, alert evaluation, alert routing, and email notifications.
 
-- Incident title
-- Severity
-- Detected anomalies
-- Likely cause
-- Recommended actions
-- Escalation decision
-- Escalation criteria
-- Supporting runbooks
+The resulting incident report can contain:
 
-The platform also exposes Prometheus metrics and can be visualized through Grafana.
+* Incident title
+* Severity
+* Detected anomalies
+* Likely cause
+* Recommended actions
+* Escalation decision
+* Escalation criteria
+* Supporting runbooks
 
 ---
 
-## Architecture
+# Architecture
 
 ```mermaid
 flowchart TB
@@ -73,11 +74,15 @@ flowchart TB
 
     Runbooks[("Operational Runbooks")]
 
-    subgraph Observability["Observability"]
+    subgraph Observability["Monitoring and Alerting"]
 
         Prom["Prometheus"]
 
-        Grafana["Grafana"]
+        Grafana["Grafana Dashboard"]
+
+        Alerting["Grafana Alerting"]
+
+        Email["Email Notifications"]
 
     end
 
@@ -89,9 +94,9 @@ flowchart TB
 
     RAG --> Runbooks
 
-    RAG --> Synth
-
     Engine --> Synth
+
+    RAG --> Synth
 
     Synth -->|"Incident Report"| API
 
@@ -103,47 +108,52 @@ flowchart TB
 
     Prom --> Grafana
 
+    Grafana --> Alerting
+
+    Alerting --> Email
+
     API -->|"Structured Response"| Client
-````
-
-### Processing Flow
-
-```text
-Telemetry
-    |
-    v
-FastAPI API
-    |
-    v
-Anomaly Detection
-    |
-    +-- CPU threshold
-    +-- RAM threshold
-    +-- Disk threshold
-    +-- Service availability
-    +-- HTTP endpoint health
-    |
-    v
-Runbook Retrieval
-    |
-    v
-Incident Synthesis
-    |
-    v
-Structured Incident Report
-    |
-    +-- Severity
-    +-- Likely Cause
-    +-- Recommended Actions
-    +-- Escalation Decision
-    +-- Supporting Runbooks
 ```
 
 ---
 
-## Key Features
+# Monitoring and Alerting Flow
 
-### Automated anomaly detection
+```text
+Infrastructure Telemetry
+        |
+        v
+FastAPI API
+        |
+        +----------------------+
+        |                      |
+        v                      v
+Anomaly Detection         /metrics
+        |                      |
+        v                      v
+Incident Analysis       Prometheus
+        |                      |
+        v                      v
+Incident Report         Grafana
+                               |
+                               v
+                        Dashboard Panels
+                               |
+                               v
+                        Alert Evaluation
+                               |
+                               v
+                        Notification Policy
+                               |
+                               v
+                        Email Notification
+```
+
+---
+
+# Key Features
+
+## Automated Anomaly Detection
 
 Configurable rules detect infrastructure conditions that require investigation.
 
@@ -155,22 +165,22 @@ Currently supported signals include:
 * Service availability
 * HTTP endpoint failures
 
-### Runbook-assisted incident analysis
+## Runbook-Assisted Incident Analysis
 
 Detected anomalies can be matched against operational runbooks stored as Markdown documents.
 
 Current runbooks include:
 
-* High CPU
+* High CPU utilization
 * Memory pressure
 * Disk and web server issues
 * Service outages
 
-The retrieval layer is designed to provide operational context without requiring the incident responder to manually search documentation.
+The retrieval layer provides operational context without requiring the incident responder to manually search documentation.
 
-### Structured incident reports
+## Structured Incident Reports
 
-Incident responses are represented using typed Pydantic models rather than unstructured text.
+Incident responses use typed Pydantic models rather than unstructured text.
 
 This makes the output suitable for:
 
@@ -180,7 +190,7 @@ This makes the output suitable for:
 * Automated remediation workflows
 * Future LLM-based summarization
 
-### REST API
+## REST API
 
 The FastAPI backend provides:
 
@@ -191,9 +201,11 @@ The FastAPI backend provides:
 * Prometheus metrics
 * OpenAPI documentation
 
-### Observability
+## Prometheus Monitoring
 
-The application exposes Prometheus-compatible metrics including:
+The application exposes Prometheus-compatible metrics.
+
+Current infrastructure metrics include:
 
 ```text
 itops_cpu_percent
@@ -201,13 +213,95 @@ itops_ram_percent
 itops_disk_percent
 ```
 
-Prometheus target health is available through:
+Prometheus target availability can be queried with:
 
 ```promql
 up{job="ai-it-ops"}
 ```
 
-### Docker support
+A value of `1` indicates that Prometheus considers the API target available.
+
+## Grafana Dashboard
+
+Grafana is configured as the visualization layer for the monitoring stack.
+
+The dashboard provides visibility into:
+
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* API and service health
+* Request latency
+* Detected anomalies
+* Infrastructure state
+
+Prometheus is used as the Grafana data source.
+
+## Grafana Alerting
+
+Grafana-managed alert rules monitor the application metrics and operational signals.
+
+The current alert rules include:
+
+| Alert                     | Condition                                                   | Severity |
+| ------------------------- | ----------------------------------------------------------- | -------- |
+| High CPU Utilization      | CPU usage exceeds the configured threshold                  | Critical |
+| High RAM Utilization      | RAM usage exceeds the configured threshold                  | Critical |
+| Critical Disk Utilization | Disk usage exceeds 90%                                      | Critical |
+| High Request Latency      | 95th percentile request latency exceeds 1 second            | Critical |
+| Anomalies Detected        | One or more anomalies detected within the evaluation window | Critical |
+
+The alerts are evaluated by Grafana and routed through the configured notification policy.
+
+## Email Notifications
+
+Grafana Alerting is configured with an email contact point.
+
+The notification pipeline is:
+
+```text
+Grafana Alert Rule
+        |
+        v
+Grafana Alertmanager
+        |
+        v
+Notification Policy
+        |
+        v
+AI IT Operations Email Contact Point
+        |
+        v
+SMTP
+        |
+        v
+Email Notification
+```
+
+The alerting configuration has been verified through the Grafana Alertmanager API.
+
+The following alerts were successfully observed as active:
+
+* High Request Latency
+* Critical Disk Utilization
+* High RAM Utilization
+* Anomalies Detected
+* High CPU Utilization
+
+Grafana logs also confirmed successful email notification delivery.
+
+Example successful notification log:
+
+```text
+receiver="AI IT Operations Email"
+integration=email
+msg="Notify success"
+attempts=1
+```
+
+Resolved alert notifications were also successfully processed.
+
+## Docker Support
 
 Docker Compose provides a complete local development environment containing:
 
@@ -216,8 +310,9 @@ Docker Compose provides a complete local development environment containing:
 * Redis
 * Prometheus
 * Grafana
+* Grafana alerting and notification configuration
 
-### Kubernetes support
+## Kubernetes Support
 
 Kubernetes manifests are provided for:
 
@@ -232,7 +327,7 @@ Kubernetes manifests are provided for:
 
 ---
 
-## Technology Stack
+# Technology Stack
 
 | Category          | Technology                           |
 | ----------------- | ------------------------------------ |
@@ -241,20 +336,22 @@ Kubernetes manifests are provided for:
 | Validation        | Pydantic                             |
 | Database          | PostgreSQL 16                        |
 | Cache             | Redis 7                              |
-| Monitoring        | Prometheus 3.5                       |
-| Visualization     | Grafana 12.1                         |
+| Monitoring        | Prometheus                           |
+| Visualization     | Grafana                              |
+| Alerting          | Grafana Alerting                     |
+| Notifications     | SMTP Email                           |
 | Containerization  | Docker                               |
 | Orchestration     | Kubernetes                           |
 | Testing           | pytest                               |
 | HTTP Client       | HTTPX                                |
 | CI                | GitHub Actions                       |
-| Configuration     | Environment variables                |
+| Configuration     | Environment Variables                |
 | Runbook Knowledge | Markdown                             |
-| Retrieval         | ChromaDB / embedding-based retrieval |
+| Retrieval         | ChromaDB / Embedding-Based Retrieval |
 
 ---
 
-## Repository Structure
+# Repository Structure
 
 ```text
 ai-it-ops-assistant/
@@ -262,7 +359,7 @@ ai-it-ops-assistant/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml
-│
+|
 ├── app/
 │   ├── api/
 │   │   ├── endpoints.py
@@ -307,7 +404,7 @@ ai-it-ops-assistant/
 │   │
 │   ├── logging_config.py
 │   └── main.py
-│
+|
 ├── data/
 │   ├── runbooks/
 │   │   ├── disk_and_webserver.md
@@ -319,7 +416,7 @@ ai-it-ops-assistant/
 │   │   └── sample_payload.json
 │   │
 │   └── degraded_server.json
-│
+|
 ├── k8s/
 │   ├── api-config.yaml
 │   ├── api-deployment.yaml
@@ -332,15 +429,15 @@ ai-it-ops-assistant/
 │       ├── prometheus-config.yaml
 │       ├── prometheus-deployment.yaml
 │       └── prometheus-service.yaml
-│
+|
 ├── prometheus/
 │   └── prometheus.yml
-│
+|
 ├── tests/
 │   ├── test_api.py
 │   ├── test_auth.py
 │   └── test_engine.py
-│
+|
 ├── .dockerignore
 ├── .gitignore
 ├── docker-compose.yml
@@ -377,24 +474,24 @@ For Kubernetes deployment:
 
 ---
 
-## Docker Compose
+# Docker Compose
 
-Docker Compose is the recommended method for running the complete local stack.
+Docker Compose is the recommended method for running the complete local monitoring stack.
 
-### 1. Clone the repository
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Baqir110/ai-it-ops-assistant.git
 cd ai-it-ops-assistant
 ```
 
-### 2. Configure environment variables
+## 2. Configure Environment Variables
 
 Create a local `.env` file containing the required configuration.
 
-Do not commit real credentials, API keys, tokens, or production secrets.
+Do not commit real credentials, API keys, SMTP passwords, tokens, or production secrets.
 
-### 3. Start the stack
+## 3. Start the Stack
 
 ```bash
 docker compose up -d --build
@@ -412,7 +509,7 @@ View logs:
 docker compose logs -f
 ```
 
-### 4. Verify the API
+## 4. Verify the API
 
 ```bash
 curl http://localhost:8000/health
@@ -461,13 +558,13 @@ Start the API:
 uvicorn app.main:app --reload
 ```
 
-The API will be available at:
+The API is available at:
 
 ```text
 http://localhost:8000
 ```
 
-Interactive Swagger documentation:
+Interactive API documentation:
 
 ```text
 http://localhost:8000/docs
@@ -481,142 +578,36 @@ http://localhost:8000/redoc
 
 ---
 
-# Kubernetes Deployment
-
-Kubernetes manifests are located under `k8s/`.
-
-The current local deployment consists of:
-
-```text
-ai-it-ops
-|
-├── AI IT Operations API
-├── PostgreSQL
-├── Redis
-└── Prometheus
-```
-
-Apply the core resources:
-
-```powershell
-kubectl apply -f .\k8s\
-```
-
-Apply Prometheus:
-
-```powershell
-kubectl apply -f .\k8s\monitoring\
-```
-
-Verify workloads:
-
-```powershell
-kubectl get pods -n ai-it-ops
-```
-
-Check services:
-
-```powershell
-kubectl get services -n ai-it-ops
-```
-
-Check all resources:
-
-```powershell
-kubectl get all -n ai-it-ops
-```
-
----
-
-# Kubernetes API Verification
-
-Expose the API locally:
-
-```powershell
-kubectl port-forward -n ai-it-ops service/ai-it-ops-api 8000:8000
-```
-
-Verify readiness:
-
-```powershell
-Invoke-RestMethod http://localhost:8000/ready
-```
-
-A healthy deployment should report dependency connectivity similar to:
-
-```text
-status: ready
-
-checks:
-  postgres: connected
-  redis: connected
-  vector_store: available
-```
-
----
-
 # Prometheus
 
-Prometheus is configured to scrape the Kubernetes API service through its internal DNS name:
+Prometheus collects metrics exposed by the FastAPI application.
 
-```text
-ai-it-ops-api.ai-it-ops.svc.cluster.local:8000
-```
-
-The Kubernetes scrape configuration is located at:
-
-```text
-k8s/monitoring/prometheus-config.yaml
-```
-
-Expose Prometheus locally:
-
-```powershell
-kubectl port-forward -n ai-it-ops service/prometheus 9090:9090
-```
-
-Open:
+When running with Docker Compose, Prometheus is available at:
 
 ```text
 http://localhost:9090
 ```
 
-## Verify the scrape target
+## Verify Metrics
 
-```powershell
-Invoke-RestMethod "http://localhost:9090/api/v1/targets"
+Open the Prometheus query interface and query:
+
+```promql
+itops_cpu_percent
 ```
 
-The API target should report:
-
-```text
-health: up
+```promql
+itops_ram_percent
 ```
 
-## Query application metrics
-
-CPU:
-
-```powershell
-Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_cpu_percent"
+```promql
+itops_disk_percent
 ```
 
-RAM:
+Check API availability:
 
-```powershell
-Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_ram_percent"
-```
-
-Disk:
-
-```powershell
-Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_disk_percent"
-```
-
-Target availability:
-
-```powershell
-Invoke-RestMethod "http://localhost:9090/api/v1/query?query=up{job='ai-it-ops'}"
+```promql
+up{job="ai-it-ops"}
 ```
 
 A value of:
@@ -625,7 +616,7 @@ A value of:
 1
 ```
 
-indicates that Prometheus considers the API target available.
+indicates that the target is available.
 
 ---
 
@@ -639,18 +630,83 @@ http://localhost:3000
 
 The local development credentials are configured in `docker-compose.yml`.
 
-Change default credentials before using the system outside a local development environment.
+Change development credentials before deploying outside a local environment.
 
-Grafana can visualize:
+Grafana provides:
 
-* CPU utilization
-* RAM utilization
-* Disk utilization
-* API availability
-* Application health
-* Incident-related metrics
+* Infrastructure monitoring dashboard
+* Prometheus data source integration
+* Alert rule evaluation
+* Notification policies
+* Email alert notifications
 
-Prometheus is used as the metrics data source.
+The current monitoring setup includes alert rules for CPU, RAM, disk utilization, request latency, and detected anomalies.
+
+---
+
+# Verifying Grafana Alerts
+
+The Grafana Alertmanager API can be queried to inspect active alerts:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:3000/api/alertmanager/grafana/api/v2/alerts" `
+  -Headers $Headers |
+  ConvertTo-Json -Depth 20
+```
+
+The alert state can report:
+
+```text
+active
+```
+
+The current configuration successfully detected multiple critical conditions simultaneously, including:
+
+```text
+High Request Latency
+Critical Disk Utilization
+High RAM Utilization
+Anomalies Detected
+High CPU Utilization
+```
+
+Verify configured contact points:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:3000/api/v1/provisioning/contact-points" `
+  -Headers $Headers |
+  ConvertTo-Json -Depth 20
+```
+
+Verify the notification policy:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://localhost:3000/api/v1/provisioning/policies" `
+  -Headers $Headers |
+  ConvertTo-Json -Depth 20
+```
+
+The policy routes alerts to:
+
+```text
+AI IT Operations Email
+```
+
+Grafana logs can be checked for notification delivery:
+
+```powershell
+docker compose logs grafana --tail=100 |
+Select-String -Pattern "smtp|email|notification|sent|error|failed"
+```
+
+A successful notification contains:
+
+```text
+msg="Notify success"
+```
 
 ---
 
@@ -753,7 +809,7 @@ RUNBOOKS_PATH=./data/runbooks
 LOG_LEVEL=info
 ```
 
-Never commit real credentials or production secrets.
+Never commit real credentials, SMTP passwords, API keys, or production secrets.
 
 ---
 
@@ -801,13 +857,65 @@ Continuous integration is configured through:
 
 # CI/CD
 
-GitHub Actions provides automated CI validation through:
+GitHub Actions provides automated CI validation.
+
+The CI workflow is located at:
 
 ```text
 .github/workflows/ci.yml
 ```
 
-The CI pipeline is intended to provide an automated quality gate for changes pushed to the repository.
+The pipeline provides an automated quality gate for changes pushed to the repository.
+
+---
+
+# Kubernetes Deployment
+
+Kubernetes manifests are located under `k8s/`.
+
+Apply the core resources:
+
+```powershell
+kubectl apply -f .\k8s\
+```
+
+Apply Prometheus monitoring:
+
+```powershell
+kubectl apply -f .\k8s\monitoring\
+```
+
+Verify workloads:
+
+```powershell
+kubectl get pods -n ai-it-ops
+```
+
+Check services:
+
+```powershell
+kubectl get services -n ai-it-ops
+```
+
+Check all resources:
+
+```powershell
+kubectl get all -n ai-it-ops
+```
+
+Expose the API locally:
+
+```powershell
+kubectl port-forward -n ai-it-ops service/ai-it-ops-api 8000:8000
+```
+
+Verify readiness:
+
+```powershell
+Invoke-RestMethod http://localhost:8000/ready
+```
+
+A healthy deployment should report dependency connectivity.
 
 ---
 
@@ -835,54 +943,50 @@ Before production deployment, the following areas should be addressed:
 
 ---
 
-# Current Kubernetes Validation
+# Current Validation
 
-The Kubernetes deployment has been validated locally.
+The monitoring and alerting pipeline has been validated locally.
 
-Core workloads successfully running:
-
-```text
-ai-it-ops-api
-postgres
-redis
-prometheus
-```
-
-Prometheus successfully discovers the API through:
+The verified architecture is:
 
 ```text
-ai-it-ops-api.ai-it-ops.svc.cluster.local:8000
-```
-
-The Prometheus target reports:
-
-```text
-health: up
-```
-
-Application metrics have also been successfully queried through the Prometheus HTTP API:
-
-```text
-itops_cpu_percent
-itops_ram_percent
-itops_disk_percent
-```
-
-This confirms the current monitoring path:
-
-```text
-API
- |
- | /metrics
- v
+FastAPI
+   |
+   | /metrics
+   v
 Prometheus
- |
- | PromQL
- v
-Monitoring / Grafana
+   |
+   | PromQL
+   v
+Grafana Dashboard
+   |
+   | Alert Rules
+   v
+Grafana Alerting
+   |
+   | Notification Policy
+   v
+Email Contact Point
+   |
+   v
+Email Notification
 ```
 
-The reported telemetry values are demonstration data and should not be interpreted as production infrastructure capacity.
+The following Grafana alerts were successfully observed in the active state:
+
+```text
+High CPU Utilization
+High RAM Utilization
+Critical Disk Utilization
+High Request Latency
+Anomalies Detected
+```
+
+Grafana notification logs confirmed successful delivery to the configured email contact point.
+
+This validates the complete monitoring and alerting flow from application telemetry to notification delivery.
+
+The reported infrastructure values are demonstration data and should not be interpreted as production infrastructure capacity.
 
 ---
 
@@ -900,7 +1004,9 @@ This project demonstrates practical implementation of:
 * Containerization
 * Kubernetes deployment
 * Prometheus monitoring
-* Grafana observability
+* Grafana dashboards
+* Grafana-managed alerting
+* Email notifications
 * Health and readiness checks
 * Automated testing
 * GitHub Actions CI
@@ -914,10 +1020,8 @@ This project demonstrates practical implementation of:
 
 Planned improvements include:
 
-* More comprehensive Prometheus alerting rules
-* Production-ready Grafana dashboards
-* Alertmanager integration
-* Slack and Microsoft Teams notifications
+* Slack notifications
+* Microsoft Teams notifications
 * Automated remediation workflows
 * Kubernetes autoscaling
 * Persistent Prometheus storage
@@ -926,12 +1030,13 @@ Planned improvements include:
 * LLM-assisted incident summarization
 * Incident history and operational analytics
 * Web-based operations dashboard
+* Advanced alert grouping and escalation policies
+* Alert silencing and maintenance windows
+* Infrastructure-as-code provisioning for Grafana dashboards and alert rules
 
 ---
 
 # Contributing
-
-Contributions are welcome.
 
 Create a feature branch:
 
@@ -973,7 +1078,6 @@ See [LICENSE](LICENSE) for details.
 
 **Muhammad Baqir**
 
-GitHub: [https://github.com/Baqir110](https://github.com/Baqir110)
+GitHub: [Baqir110 on GitHub](https://github.com/Baqir110?utm_source=chatgpt.com)
 
-LinkedIn: [https://www.linkedin.com/in/muhammad-baqir-it/](https://www.linkedin.com/in/muhammad-baqir-it/)
-
+LinkedIn: [Muhammad Baqir on LinkedIn](https://www.linkedin.com/in/muhammad-baqir-it/?utm_source=chatgpt.com)

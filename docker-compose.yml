@@ -10,7 +10,7 @@
     environment:
       DATABASE_URL: postgresql+psycopg://ops:ops@postgres:5432/ops
       REDIS_URL: redis://redis:6379/0
-      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 
       CPU_THRESHOLD: "85.0"
       RAM_THRESHOLD: "85.0"
@@ -106,8 +106,19 @@
       - "3000:3000"
 
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: smtp.gmail.com:587
+      GF_SMTP_USER: ${GRAFANA_SMTP_USER}
+      GF_SMTP_PASSWORD: ${GRAFANA_SMTP_PASSWORD}
+      GF_SMTP_FROM_ADDRESS: ${GRAFANA_SMTP_FROM_ADDRESS}
+      GF_SMTP_FROM_NAME: "AI IT Operations"
+      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
+
+      GF_LOG_LEVEL: debug
+      GF_LOG_FILTERS: "smtp:debug"
 
     volumes:
       - grafana_data:/var/lib/grafana

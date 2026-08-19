@@ -42,3 +42,4 @@ data/vector_store/
 # Docker image archives
 *.tar
 *.tar
+.env
