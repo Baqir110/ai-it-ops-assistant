@@ -24,3 +24,4 @@ click==8.3.1
 huggingface-hub<1.27.0
 kubernetes<36.0.0
 python-jose[cryptography]
+redis>=5.0.0
