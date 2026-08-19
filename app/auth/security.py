@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
-from jose import jwt, JWTError
+from jose import jwt
 import os
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-super-secret-key-change-in-production")
