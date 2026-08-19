@@ -1,6 +1,8 @@
 ﻿services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: ai-it-ops-api
     ports:
       - "8000:8000"
@@ -8,11 +10,15 @@
     environment:
       DATABASE_URL: postgresql+psycopg://ops:ops@postgres:5432/ops
       REDIS_URL: redis://redis:6379/0
-      OPENAI_API_KEY: ""
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
 
       CPU_THRESHOLD: "85.0"
       RAM_THRESHOLD: "85.0"
       DISK_THRESHOLD: "90.0"
+
+      VECTOR_STORE_PATH: "./data/vector_store"
+      RUNBOOKS_PATH: "./data/runbooks"
+      LOG_LEVEL: "info"
 
     volumes:
       - ./app:/app/app
@@ -98,6 +104,10 @@
 
     ports:
       - "3000:3000"
+
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 
     volumes:
       - grafana_data:/var/lib/grafana
