@@ -1,64 +1,50 @@
-# AI-Powered IT Operations Assistant
+# AI IT Operations Assistant
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
-[![LangChain](https://img.shields.io/badge/LangChain-0.3+-orange.svg)](https://www.langchain.com/)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-purple.svg)](https://www.trychroma.com/)
-[![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-yellow.svg)](https://huggingface.co/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
-[![pytest](https://img.shields.io/badge/pytest-7.0+-red.svg)](https://docs.pytest.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+An infrastructure-focused AIOps platform for automated telemetry analysis, anomaly detection, runbook retrieval, and incident triage.
 
----
+Built with FastAPI, PostgreSQL, Redis, Prometheus, Grafana, Docker, and Kubernetes, the project demonstrates a production-oriented backend architecture for IT operations and observability workflows.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Use Cases](#use-cases)
-- [Architecture](#architecture)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Repository Structure](#repository-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start with Docker](#quick-start-with-docker)
-  - [Building the Docker Image](#building-the-docker-image)
-  - [Local Development](#local-development)
-- [Configuration](#configuration)
-- [Local Dashboard Access](#local-dashboard-access)
-- [Sample Payload & Output](#sample-payload--output)
-- [Testing](#testing)
-- [Monitoring & Observability](#monitoring--observability)
-- [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+[![CI](https://github.com/Baqir110/ai-it-ops-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Baqir110/ai-it-ops-assistant/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-API-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D.svg?logo=redis&logoColor=white)](https://redis.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-3.5-E6522C.svg?logo=prometheus&logoColor=white)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-12.1-F46800.svg?logo=grafana&logoColor=white)](https://grafana.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC.svg)](https://pytest.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
 
 ## Overview
 
-An automated AIOps incident triage engine built with FastAPI, LangChain, ChromaDB, and Pydantic. The system ingests real‑time infrastructure telemetry (CPU, RAM, disk, process health, HTTP status), detects system anomalies, and performs vector similarity search against operational runbooks to produce structured incident reports.
+AI IT Operations Assistant analyzes infrastructure telemetry and converts detected operational problems into structured incident reports.
 
-The service reduces Mean Time to Detection (MTTD) and Mean Time to Resolution (MTTR) by automating initial analysis and providing actionable recommendations.
+The system accepts signals such as:
 
-Key differentiators:
+- CPU utilization
+- RAM utilization
+- Disk utilization
+- Service availability
+- HTTP endpoint health
+- Operational events
 
-- **Zero‑configuration RAG**: Pre‑indexed runbook knowledge base with embeddings for instant retrieval.
-- **Strongly typed incident reports**: Pydantic‑enforced schemas for consistent downstream automation.
-- **Container‑native**: Full Docker Compose setup with Prometheus and Grafana integration.
-- **Extensible rule engine**: Custom threshold rules and anomaly detection logic can be added without code modification.
+Telemetry is evaluated by a rule-based anomaly detection engine. Detected anomalies can then be correlated with operational runbooks to provide troubleshooting context and recommended actions.
 
----
+The resulting incident report contains structured information such as:
 
-## Use Cases
+- Incident title
+- Severity
+- Detected anomalies
+- Likely cause
+- Recommended actions
+- Escalation decision
+- Escalation criteria
+- Supporting runbooks
 
-- **Infrastructure monitoring**: Analyze telemetry from servers, containers, or cloud instances.
-- **On‑call support**: Provide SREs with immediate incident context and recommended remediation actions.
-- **Runbook automation**: Retrieve relevant operational procedures in a structured format.
-- **AIOps reference architecture**: Demonstrate integration of RAG into IT operations workflows.
-- **Self‑healing systems**: Feed structured outputs into automated remediation pipelines (Ansible, Kubernetes operators).
+The platform also exposes Prometheus metrics and can be visualized through Grafana.
 
 ---
 
@@ -66,353 +52,928 @@ Key differentiators:
 
 ```mermaid
 flowchart TB
-    subgraph Input
-        T[Telemetry Payload JSON]
+
+    Client["Client / Monitoring Agent"]
+
+    subgraph Platform["AI IT Operations Platform"]
+
+        API["FastAPI API"]
+
+        Engine["Anomaly Detection Engine"]
+
+        RAG["Runbook Retrieval"]
+
+        Synth["Incident Synthesizer"]
+
+        PG[("PostgreSQL")]
+
+        Redis[("Redis")]
+
     end
 
-    subgraph Processing
-        API[FastAPI Endpoint]
-        RE[Rule Engine<br/>Anomaly Detection]
-        VS[Vector Similarity Search<br/>ChromaDB]
-        RS[Incident Report Synthesizer]
+    Runbooks[("Operational Runbooks")]
+
+    subgraph Observability["Observability"]
+
+        Prom["Prometheus"]
+
+        Grafana["Grafana"]
+
     end
 
-    subgraph Data
-        RB[Runbook Knowledge Base<br/>Markdown Files]
-        VD[(Vector Database<br/>all-MiniLM-L6-v2)]
-    end
+    Client -->|"Telemetry"| API
 
-    subgraph Output
-        IR[Structured Incident Report JSON]
-    end
+    API --> Engine
 
-    T --> API
-    API --> RE
-    RE -->|Anomalies| VS
-    RB --> VD
-    VD --> VS
-    VS -->|Top K Runbooks| RS
-    RS --> IR
+    Engine --> RAG
+
+    RAG --> Runbooks
+
+    RAG --> Synth
+
+    Engine --> Synth
+
+    Synth -->|"Incident Report"| API
+
+    API --> PG
+
+    API --> Redis
+
+    API -->|"/metrics"| Prom
+
+    Prom --> Grafana
+
+    API -->|"Structured Response"| Client
+````
+
+### Processing Flow
+
+```text
+Telemetry
+    |
+    v
+FastAPI API
+    |
+    v
+Anomaly Detection
+    |
+    +-- CPU threshold
+    +-- RAM threshold
+    +-- Disk threshold
+    +-- Service availability
+    +-- HTTP endpoint health
+    |
+    v
+Runbook Retrieval
+    |
+    v
+Incident Synthesis
+    |
+    v
+Structured Incident Report
+    |
+    +-- Severity
+    +-- Likely Cause
+    +-- Recommended Actions
+    +-- Escalation Decision
+    +-- Supporting Runbooks
 ```
 
-Data Flow
+---
 
-Stage Component Description
-Ingestion FastAPI Endpoint Accepts telemetry via POST /api/v1/telemetry/analyze.
-Anomaly detection Rule Engine Evaluates metrics against thresholds; flags violations and service failures.
-Context retrieval ChromaDB + LangChain Embeds anomalies and retrieves matching runbooks.
-Report synthesis Incident Synthesizer Combines anomalies and runbook context into a structured JSON report.
-Output Incident Report Returns severity, root cause, recommended actions, escalation, and sources.
+## Key Features
+
+### Automated anomaly detection
+
+Configurable rules detect infrastructure conditions that require investigation.
+
+Currently supported signals include:
+
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* Service availability
+* HTTP endpoint failures
+
+### Runbook-assisted incident analysis
+
+Detected anomalies can be matched against operational runbooks stored as Markdown documents.
+
+Current runbooks include:
+
+* High CPU
+* Memory pressure
+* Disk and web server issues
+* Service outages
+
+The retrieval layer is designed to provide operational context without requiring the incident responder to manually search documentation.
+
+### Structured incident reports
+
+Incident responses are represented using typed Pydantic models rather than unstructured text.
+
+This makes the output suitable for:
+
+* Monitoring integrations
+* Alerting pipelines
+* Incident-management systems
+* Automated remediation workflows
+* Future LLM-based summarization
+
+### REST API
+
+The FastAPI backend provides:
+
+* Telemetry analysis
+* Health checks
+* Readiness checks
+* Authentication endpoints
+* Prometheus metrics
+* OpenAPI documentation
+
+### Observability
+
+The application exposes Prometheus-compatible metrics including:
+
+```text
+itops_cpu_percent
+itops_ram_percent
+itops_disk_percent
+```
+
+Prometheus target health is available through:
+
+```promql
+up{job="ai-it-ops"}
+```
+
+### Docker support
+
+Docker Compose provides a complete local development environment containing:
+
+* FastAPI
+* PostgreSQL
+* Redis
+* Prometheus
+* Grafana
+
+### Kubernetes support
+
+Kubernetes manifests are provided for:
+
+* API deployment
+* API service
+* API configuration
+* API secrets
+* PostgreSQL
+* Redis
+* Prometheus
+* Persistent PostgreSQL storage
 
 ---
 
-Key Features
+## Technology Stack
 
-· Automated anomaly detection: Monitors CPU, RAM, disk, services, and HTTP endpoints with configurable thresholds.
-· RAG‑powered runbook retrieval: Embeds anomalies using all-MiniLM-L6-v2 (HuggingFace) and retrieves relevant procedures via ChromaDB.
-· Structured incident reports: Pydantic v2 schemas enforce consistent output including title, severity, likely cause, recommended actions, escalation criteria, and sources consulted.
-· Container‑ready and monitored: Multi‑service Docker Compose setup (API, PostgreSQL, Redis, Prometheus, Grafana) includes automated Grafana configuration scripts.
-· Comprehensive test coverage: pytest suite covers the rule engine, RAG retrieval, and API endpoints.
-· External HTTP health checks: Uses httpx to verify downstream service availability.
-
----
-
-Technology Stack
-
-Category Technology Version
-Language Python 3.11+ / 3.13
-Web Framework FastAPI 0.115+
-Data Validation Pydantic 2.0+
-Vector Database ChromaDB 0.5+
-LLM Framework LangChain 0.3+
-Embeddings HuggingFace all-MiniLM-L6-v2 -
-Database & Cache PostgreSQL, Redis -
-Monitoring Prometheus, Grafana -
-Testing Pytest, HTTPX 7.0+
-Containerization Docker, Docker Compose -
+| Category          | Technology                           |
+| ----------------- | ------------------------------------ |
+| Language          | Python 3.11+                         |
+| API Framework     | FastAPI                              |
+| Validation        | Pydantic                             |
+| Database          | PostgreSQL 16                        |
+| Cache             | Redis 7                              |
+| Monitoring        | Prometheus 3.5                       |
+| Visualization     | Grafana 12.1                         |
+| Containerization  | Docker                               |
+| Orchestration     | Kubernetes                           |
+| Testing           | pytest                               |
+| HTTP Client       | HTTPX                                |
+| CI                | GitHub Actions                       |
+| Configuration     | Environment variables                |
+| Runbook Knowledge | Markdown                             |
+| Retrieval         | ChromaDB / embedding-based retrieval |
 
 ---
 
-Repository Structure
+## Repository Structure
 
-```plaintext
+```text
 ai-it-ops-assistant/
+|
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 │
 ├── app/
-│   ├── __init__.py
-│   ├── main.py                 # Application entry point
+│   ├── api/
+│   │   ├── endpoints.py
+│   │   ├── health.py
+│   │   └── v1/
+│   │       └── auth.py
 │   │
-│   ├── api/                    # Route handlers & endpoints
-│   │   ├── __init__.py
-│   │   └── routes.py
+│   ├── auth/
+│   │   ├── dependencies.py
+│   │   └── security.py
 │   │
-│   ├── config/                 # Environment & metric threshold configuration
-│   │   ├── __init__.py
+│   ├── cache/
+│   │   └── redis.py
+│   │
+│   ├── config/
 │   │   └── settings.py
 │   │
-│   ├── engine/                 # Anomaly & rule evaluation engine
-│   │   ├── __init__.py
+│   ├── database/
+│   │   ├── connection.py
+│   │   ├── models.py
+│   │   └── repositories.py
+│   │
+│   ├── engine/
+│   │   ├── anomaly_detector.py
 │   │   └── rules.py
 │   │
-│   ├── models/                 # Pydantic data schemas
-│   │   ├── __init__.py
+│   ├── models/
+│   │   ├── audit.py
+│   │   ├── incident.py
+│   │   ├── schemas.py
 │   │   ├── telemetry.py
-│   │   └── incident.py
+│   │   └── user.py
 │   │
-│   ├── rag/                    # Vector database & runbook search
-│   │   ├── __init__.py
-│   │   ├── vector_store.py
-│   │   └── retriever.py
+│   ├── monitoring/
+│   │   └── metrics.py
 │   │
-│   └── services/               # Incident report synthesizer
-│       ├── __init__.py
-│       └── synthesizer.py
+│   ├── rag/
+│   │   └── runbook_search.py
+│   │
+│   ├── services/
+│   │   └── synthesizer.py
+│   │
+│   ├── logging_config.py
+│   └── main.py
 │
 ├── data/
-│   ├── runbooks/               # Operational Markdown runbooks
+│   ├── runbooks/
 │   │   ├── disk_and_webserver.md
-│   │   └── network_issues.md
-│   └── telemetry_samples/      # Sample payloads for testing
-│       └── sample_payload.json
+│   │   ├── high_cpu.md
+│   │   ├── memory_pressure.md
+│   │   └── service_outage.md
+│   │
+│   ├── telemetry_samples/
+│   │   └── sample_payload.json
+│   │
+│   └── degraded_server.json
+│
+├── k8s/
+│   ├── api-config.yaml
+│   ├── api-deployment.yaml
+│   ├── api-secret.yaml
+│   ├── api-service.yaml
+│   ├── postgres.yaml
+│   ├── redis.yaml
+│   │
+│   └── monitoring/
+│       ├── prometheus-config.yaml
+│       ├── prometheus-deployment.yaml
+│       └── prometheus-service.yaml
 │
 ├── prometheus/
-│   └── prometheus.yml          # Prometheus scrape configuration
+│   └── prometheus.yml
 │
-├── tests/                      # Automated test suite
-│   ├── __init__.py
-│   ├── test_engine.py
-│   ├── test_rag.py
-│   └── test_api.py
+├── tests/
+│   ├── test_api.py
+│   ├── test_auth.py
+│   └── test_engine.py
 │
-├── .env.example                # Environment variables template
+├── .dockerignore
 ├── .gitignore
-├── Dockerfile
 ├── docker-compose.yml
-├── pyproject.toml              # Project and linter configuration
+├── Dockerfile
+├── gunicorn.conf.py
+├── pytest.ini
 ├── requirements.txt
-├── setup-grafana.ps1           # Windows Grafana setup script
-├── setup-grafana.sh            # Linux/macOS Grafana setup script
+├── setup-grafana.ps1
 └── README.md
 ```
 
 ---
 
-Getting Started
+# Getting Started
 
-Prerequisites
+## Prerequisites
 
-· Python 3.11 or higher (Python 3.13 is also supported)
-· pip and git
-· Docker Desktop (optional, for containerized execution)
+For Docker-based development:
 
-Quick Start with Docker
+* Docker Desktop
+* Git
 
-Run all services with Docker Compose:
+For local Python development:
 
-1. Set up environment variables
-   Copy .env.example to .env in the project root:
-   ```bash
-   cp .env.example .env
-   ```
-   Update the configuration inside .env:
-   ```env
-   OPENAI_API_KEY=your_openai_api_key_here   # Optional – only for LLM‑augmented summaries
-   CPU_THRESHOLD_HIGH=85.0
-   CPU_THRESHOLD_CRITICAL=95.0
-   RAM_THRESHOLD_HIGH=80.0
-   DISK_THRESHOLD_CRITICAL=90.0
-   VECTOR_STORE_PATH=./data/vector_store
-   RUNBOOKS_PATH=./data/runbooks
-   EMBEDDING_MODEL=all-MiniLM-L6-v2
-   TOP_K_RESULTS=3
-   ```
-2. Start the stack
-   ```bash
-   docker compose up -d
-   ```
-   To force a rebuild of the API image:
-   ```bash
-   docker compose up --build -d
-   ```
-3. View logs (optional)
-   ```bash
-   docker compose logs -f
-   ```
-4. Configure Grafana (optional)
-   · Windows: .\setup-grafana.ps1
-   · Linux/macOS: ./setup-grafana.sh
+* Python 3.11+
+* pip
+* Git
 
-Building the Docker Image
+For Kubernetes deployment:
 
-To build only the API image for standalone use:
+* Kubernetes cluster
+* kubectl
+* Container image available to the cluster
+
+---
+
+## Docker Compose
+
+Docker Compose is the recommended method for running the complete local stack.
+
+### 1. Clone the repository
 
 ```bash
-docker build -t ai-it-ops:latest .
+git clone https://github.com/Baqir110/ai-it-ops-assistant.git
+cd ai-it-ops-assistant
 ```
 
-To run the container independently (without the auxiliary services):
+### 2. Configure environment variables
+
+Create a local `.env` file containing the required configuration.
+
+Do not commit real credentials, API keys, tokens, or production secrets.
+
+### 3. Start the stack
 
 ```bash
-docker run -d -p 8000:8000 --env-file .env ai-it-ops:latest
+docker compose up -d --build
 ```
 
-For full monitoring stack functionality, use Docker Compose as described above.
+Check service status:
 
-Local Development (without Docker)
+```bash
+docker compose ps
+```
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/baqir110/ai-it-ops-assistant.git
-   cd ai-it-ops-assistant
-   ```
-2. Create and activate a virtual environment
-   ```bash
-   python -m venv .venv
-   ```
-   · Windows (PowerShell): .\.venv\Scripts\Activate.ps1
-   · Linux / macOS: source .venv/bin/activate
-3. Install dependencies
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-4. Run the API server
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   Interactive Swagger documentation is available at http://127.0.0.1:8000/docs.
+View logs:
 
----
+```bash
+docker compose logs -f
+```
 
-Configuration
+### 4. Verify the API
 
-Runtime settings are managed via environment variables in .env:
+```bash
+curl http://localhost:8000/health
+```
 
-Variable Description Default
-OPENAI_API_KEY Optional; required only for LLM‑augmented summaries. The rule‑based synthesizer functions without it. (empty)
-CPU_THRESHOLD_HIGH CPU utilization percentage for HIGH alert 85.0
-CPU_THRESHOLD_CRITICAL CPU utilization percentage for CRITICAL alert 95.0
-RAM_THRESHOLD_HIGH RAM utilization percentage for HIGH alert 80.0
-DISK_THRESHOLD_CRITICAL Disk utilization percentage for CRITICAL alert 90.0
-VECTOR_STORE_PATH ChromaDB persistence directory ./data/vector_store
-RUNBOOKS_PATH Directory containing Markdown runbooks ./data/runbooks
-EMBEDDING_MODEL HuggingFace embedding model name all-MiniLM-L6-v2
-TOP_K_RESULTS Number of runbooks to retrieve 3
+Check dependency readiness:
+
+```bash
+curl http://localhost:8000/ready
+```
+
+The readiness endpoint verifies connectivity to required dependencies such as PostgreSQL, Redis, and the vector store.
 
 ---
 
-Local Dashboard Access
+# Local Python Development
 
-Service Access URL Default Credentials
-Swagger UI http://localhost:8000/docs None
-ReDoc http://localhost:8000/redoc None
-Prometheus http://localhost:9090 None
-Grafana http://localhost:3000 admin / admin (password change required on first login)
-PostgreSQL localhost:5432 Configured in .env
-Redis localhost:6379 None
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Linux/macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Start the API:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The API will be available at:
+
+```text
+http://localhost:8000
+```
+
+Interactive Swagger documentation:
+
+```text
+http://localhost:8000/docs
+```
+
+ReDoc:
+
+```text
+http://localhost:8000/redoc
+```
 
 ---
 
-Sample Payload & Output
+# Kubernetes Deployment
 
-Request – POST /api/v1/telemetry/analyze
+Kubernetes manifests are located under `k8s/`.
+
+The current local deployment consists of:
+
+```text
+ai-it-ops
+|
+├── AI IT Operations API
+├── PostgreSQL
+├── Redis
+└── Prometheus
+```
+
+Apply the core resources:
+
+```powershell
+kubectl apply -f .\k8s\
+```
+
+Apply Prometheus:
+
+```powershell
+kubectl apply -f .\k8s\monitoring\
+```
+
+Verify workloads:
+
+```powershell
+kubectl get pods -n ai-it-ops
+```
+
+Check services:
+
+```powershell
+kubectl get services -n ai-it-ops
+```
+
+Check all resources:
+
+```powershell
+kubectl get all -n ai-it-ops
+```
+
+---
+
+# Kubernetes API Verification
+
+Expose the API locally:
+
+```powershell
+kubectl port-forward -n ai-it-ops service/ai-it-ops-api 8000:8000
+```
+
+Verify readiness:
+
+```powershell
+Invoke-RestMethod http://localhost:8000/ready
+```
+
+A healthy deployment should report dependency connectivity similar to:
+
+```text
+status: ready
+
+checks:
+  postgres: connected
+  redis: connected
+  vector_store: available
+```
+
+---
+
+# Prometheus
+
+Prometheus is configured to scrape the Kubernetes API service through its internal DNS name:
+
+```text
+ai-it-ops-api.ai-it-ops.svc.cluster.local:8000
+```
+
+The Kubernetes scrape configuration is located at:
+
+```text
+k8s/monitoring/prometheus-config.yaml
+```
+
+Expose Prometheus locally:
+
+```powershell
+kubectl port-forward -n ai-it-ops service/prometheus 9090:9090
+```
+
+Open:
+
+```text
+http://localhost:9090
+```
+
+## Verify the scrape target
+
+```powershell
+Invoke-RestMethod "http://localhost:9090/api/v1/targets"
+```
+
+The API target should report:
+
+```text
+health: up
+```
+
+## Query application metrics
+
+CPU:
+
+```powershell
+Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_cpu_percent"
+```
+
+RAM:
+
+```powershell
+Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_ram_percent"
+```
+
+Disk:
+
+```powershell
+Invoke-RestMethod "http://localhost:9090/api/v1/query?query=itops_disk_percent"
+```
+
+Target availability:
+
+```powershell
+Invoke-RestMethod "http://localhost:9090/api/v1/query?query=up{job='ai-it-ops'}"
+```
+
+A value of:
+
+```text
+1
+```
+
+indicates that Prometheus considers the API target available.
+
+---
+
+# Grafana
+
+When running through Docker Compose, Grafana is available at:
+
+```text
+http://localhost:3000
+```
+
+The local development credentials are configured in `docker-compose.yml`.
+
+Change default credentials before using the system outside a local development environment.
+
+Grafana can visualize:
+
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* API availability
+* Application health
+* Incident-related metrics
+
+Prometheus is used as the metrics data source.
+
+---
+
+# API
+
+## Analyze Infrastructure Telemetry
+
+Endpoint:
+
+```http
+POST /api/v1/telemetry/analyze
+```
+
+Example request:
 
 ```json
 {
   "cpu_percent": 94.0,
   "ram_percent": 91.0,
   "disk_percent": 97.0,
-  "services": { "apache2": "DOWN" },
-  "http_endpoints": { "https://app.internal/health": 503 }
+  "services": {
+    "apache2": "DOWN"
+  },
+  "http_endpoints": {
+    "https://app.internal/health": 503
+  }
 }
 ```
 
-Response
+Example response:
 
 ```json
 {
-  "incident_title": "Incident: Infrastructure Degradation (High CPU utilization: 94.0%, High RAM utilization: 91.0%)",
+  "incident_title": "Infrastructure degradation detected",
   "severity": "CRITICAL",
-  "likely_cause": "Detected 5 system anomaly/anomalies: High CPU utilization: 94.0%; High RAM utilization: 91.0%; Critical Disk utilization: 97.0%; Service outage: apache2 is DOWN; Endpoint failure: https://app.internal/health returned HTTP 503.",
+  "likely_cause": "Multiple infrastructure health indicators exceeded configured thresholds.",
   "recommended_actions": [
-    "Inspect system and application logs under /var/log for critical errors.",
-    "Verify process states and resource consumption using system diagnostic tools.",
-    "Identify and remove/rotate large log files to free up disk capacity.",
-    "Attempt service restart for: apache2"
+    "Inspect system and application logs.",
+    "Identify processes consuming excessive resources.",
+    "Free disk capacity.",
+    "Attempt service recovery."
   ],
   "escalation_required": true,
-  "escalation_criteria": "Escalate to On-Call Infrastructure Team if service recovery fails after automated actions or disk usage remains >95%.",
+  "escalation_criteria": "Escalate when service recovery fails or critical resource thresholds remain exceeded.",
   "sources_consulted": [
     {
       "title": "disk_and_webserver.md",
-      "file_path": "data/runbooks/disk_and_webserver.md",
       "relevance_score": 0.58
     }
   ]
 }
 ```
 
+The authoritative response schema is defined by the application's Pydantic models.
+
 ---
 
-Testing
+# API Endpoints
 
-Execute the test suite using pytest:
+| Endpoint                    | Purpose                           |
+| --------------------------- | --------------------------------- |
+| `/health`                   | Application health check          |
+| `/ready`                    | Dependency readiness check        |
+| `/metrics`                  | Prometheus metrics                |
+| `/docs`                     | Swagger / OpenAPI documentation   |
+| `/redoc`                    | ReDoc documentation               |
+| `/api/v1/telemetry/analyze` | Infrastructure telemetry analysis |
+
+---
+
+# Configuration
+
+Runtime configuration is controlled through environment variables.
+
+| Variable            | Purpose                      |
+| ------------------- | ---------------------------- |
+| `DATABASE_URL`      | PostgreSQL connection string |
+| `REDIS_URL`         | Redis connection string      |
+| `OPENAI_API_KEY`    | Optional LLM integration     |
+| `CPU_THRESHOLD`     | CPU anomaly threshold        |
+| `RAM_THRESHOLD`     | RAM anomaly threshold        |
+| `DISK_THRESHOLD`    | Disk anomaly threshold       |
+| `VECTOR_STORE_PATH` | Vector store location        |
+| `RUNBOOKS_PATH`     | Runbook directory            |
+| `LOG_LEVEL`         | Application logging level    |
+
+Example:
+
+```env
+DATABASE_URL=postgresql+psycopg://ops:ops@postgres:5432/ops
+REDIS_URL=redis://redis:6379/0
+
+CPU_THRESHOLD=85.0
+RAM_THRESHOLD=85.0
+DISK_THRESHOLD=90.0
+
+VECTOR_STORE_PATH=./data/vector_store
+RUNBOOKS_PATH=./data/runbooks
+
+LOG_LEVEL=info
+```
+
+Never commit real credentials or production secrets.
+
+---
+
+# Testing
+
+The project uses pytest for automated testing.
+
+Run the complete test suite:
 
 ```bash
-# Run all tests
 pytest
+```
 
-# Run with verbose output
+Verbose output:
+
+```bash
 pytest -v
+```
 
-# Run only engine tests
+API tests:
+
+```bash
+pytest tests/test_api.py -v
+```
+
+Authentication tests:
+
+```bash
+pytest tests/test_auth.py -v
+```
+
+Anomaly detection tests:
+
+```bash
 pytest tests/test_engine.py -v
+```
+
+Continuous integration is configured through:
+
+```text
+.github/workflows/ci.yml
 ```
 
 ---
 
-Monitoring & Observability
+# CI/CD
 
-· Prometheus metrics: A scraping endpoint is configured for operational metrics collection.
-· Grafana dashboards: Setup scripts (Windows and Linux/macOS) are provided to pre‑configure dashboards.
-· Health checks: The API exposes a /health endpoint for container liveness and readiness probes.
+GitHub Actions provides automated CI validation through:
 
----
+```text
+.github/workflows/ci.yml
+```
 
-Deployment
-
-· Persistent vector database: Attach dedicated storage volumes for ChromaDB in production deployments.
-· Security and secrets: Use environment variables for secrets and terminate HTTPS via a reverse proxy.
-· Container orchestration: Deploy with Docker Compose or adapt the provided configuration for Kubernetes.
+The CI pipeline is intended to provide an automated quality gate for changes pushed to the repository.
 
 ---
 
-Roadmap
+# Security Considerations
 
-· LLM‑augmented incident summary generation for more fluent, human‑like text.
-· Slack and Microsoft Teams webhook integration for alerting.
-· Automated remediation playbooks (Ansible / Kubernetes).
-· Web UI (Streamlit or React) for telemetry submission and incident history visualization.
+This repository is primarily an engineering and portfolio project.
+
+Before production deployment, the following areas should be addressed:
+
+* Replace development credentials.
+* Store secrets using Kubernetes Secrets or an external secret manager.
+* Do not expose PostgreSQL or Redis publicly.
+* Enable HTTPS/TLS through an ingress or reverse proxy.
+* Run application containers as a non-root user.
+* Define CPU and memory requests and limits.
+* Add Kubernetes NetworkPolicies.
+* Configure persistent storage for monitoring data.
+* Implement PostgreSQL backup and recovery.
+* Implement production-grade authentication and authorization.
+* Add rate limiting where appropriate.
+* Pin and regularly update dependencies.
+* Scan container images for vulnerabilities.
+* Configure appropriate logging and audit retention.
+* Use production-grade PostgreSQL and Redis configurations.
 
 ---
 
-Contributing
+# Current Kubernetes Validation
 
-1. Fork the repository.
-2. Create a feature branch (git checkout -b feature/your-feature).
-3. Commit your changes (git commit -m 'Add some feature').
-4. Push to the branch (git push origin feature/your-feature).
-5. Open a Pull Request.
+The Kubernetes deployment has been validated locally.
+
+Core workloads successfully running:
+
+```text
+ai-it-ops-api
+postgres
+redis
+prometheus
+```
+
+Prometheus successfully discovers the API through:
+
+```text
+ai-it-ops-api.ai-it-ops.svc.cluster.local:8000
+```
+
+The Prometheus target reports:
+
+```text
+health: up
+```
+
+Application metrics have also been successfully queried through the Prometheus HTTP API:
+
+```text
+itops_cpu_percent
+itops_ram_percent
+itops_disk_percent
+```
+
+This confirms the current monitoring path:
+
+```text
+API
+ |
+ | /metrics
+ v
+Prometheus
+ |
+ | PromQL
+ v
+Monitoring / Grafana
+```
+
+The reported telemetry values are demonstration data and should not be interpreted as production infrastructure capacity.
 
 ---
 
-License
+# Project Goals
 
-Distributed under the MIT License.
+This project demonstrates practical implementation of:
+
+* REST API development
+* Backend application architecture
+* Infrastructure telemetry processing
+* Rule-based anomaly detection
+* Runbook-assisted incident analysis
+* PostgreSQL persistence
+* Redis caching
+* Containerization
+* Kubernetes deployment
+* Prometheus monitoring
+* Grafana observability
+* Health and readiness checks
+* Automated testing
+* GitHub Actions CI
+* Configuration management
+* Secret management
+* Infrastructure-oriented software design
 
 ---
 
-Contact
-LinkdeIn:https://www.linkedin.com/in/muhammad-baqir-it/
-Author: Muhammad Baqir
-GitHub: github.com/baqir110
+# Roadmap
+
+Planned improvements include:
+
+* More comprehensive Prometheus alerting rules
+* Production-ready Grafana dashboards
+* Alertmanager integration
+* Slack and Microsoft Teams notifications
+* Automated remediation workflows
+* Kubernetes autoscaling
+* Persistent Prometheus storage
+* PostgreSQL backup automation
+* Improved authentication and authorization
+* LLM-assisted incident summarization
+* Incident history and operational analytics
+* Web-based operations dashboard
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+Create a feature branch:
+
+```bash
+git checkout -b feature/your-feature
+```
+
+Run the test suite:
+
+```bash
+pytest -v
+```
+
+Commit your changes:
+
+```bash
+git commit -m "Add your change"
+```
+
+Push the branch:
+
+```bash
+git push origin feature/your-feature
+```
+
+Then open a Pull Request.
+
+---
+
+# License
+
+This project is licensed under the MIT License.
+
+See [LICENSE](LICENSE) for details.
+
+---
+
+# Author
+
+**Muhammad Baqir**
+
+GitHub: [https://github.com/Baqir110](https://github.com/Baqir110)
+
+LinkedIn: [https://www.linkedin.com/in/muhammad-baqir-it/](https://www.linkedin.com/in/muhammad-baqir-it/)
+
