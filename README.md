@@ -18,124 +18,312 @@ Built with FastAPI, PostgreSQL, Redis, Prometheus, Grafana, Docker, and Kubernet
 
 ---
 
-## 📋 Table of Contents
+## Overview
 
-- [Overview](#overview)
-- [Use Cases](#use-cases)
-- [Architecture](#architecture)
-- [Key Features](#key-features)
-- [Technology Stack](#technology-stack)
-- [Repository Structure](#repository-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Local Setup](#local-setup)
-  - [Running with Docker](#running-with-docker)
-- [Configuration](#configuration)
-- [Sample Payload & Output](#sample-payload--output)
-- [Testing](#testing)
-- [Monitoring & Observability](#monitoring--observability)
-- [Deployment](#deployment)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+AI IT Operations Assistant analyzes infrastructure telemetry and converts detected operational problems into structured incident reports.
 
----
+The platform processes signals such as:
 
-## 📖 Overview
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* Service availability
+* HTTP endpoint health
+* Request latency
+* Operational anomalies
 
-An **automated AIOps incident triage engine** built with FastAPI, LangChain, ChromaDB, and Pydantic. The platform ingests real-time infrastructure telemetry (CPU, RAM, Disk, process health, HTTP status), identifies active system anomalies, and performs vector similarity search against operational runbooks to synthesize structured incident reports.
+Telemetry is evaluated by a rule-based anomaly detection engine. Detected anomalies can be correlated with operational runbooks to provide troubleshooting context and recommended actions.
 
-This system transforms raw infrastructure metrics into actionable intelligence, reducing Mean Time to Detection (MTTD) and Mean Time to Resolution (MTTR) by automating the initial incident analysis and remediation recommendation process.
+The application also exposes Prometheus-compatible metrics. Prometheus collects the metrics, while Grafana provides dashboards, alert evaluation, alert routing, and email notifications.
 
-**Key Differentiators**:
-- **Zero‑configuration RAG**: Pre‑indexed runbook knowledge base with embeddings for instant retrieval.
-- **Strongly Typed Incident Reports**: Pydantic‑enforced schemas ensure consistent output for downstream automation.
-- **Container‑Native**: Full Docker support with a lightweight Python 3.11 base image.
-- **Extensible Rule Engine**: Easily add custom threshold rules and anomaly detection logic.
+The resulting incident report can contain:
+
+* Incident title
+* Severity
+* Detected anomalies
+* Likely cause
+* Recommended actions
+* Escalation decision
+* Escalation criteria
+* Supporting runbooks
 
 ---
 
-## 🎯 Use Cases
-
-- **Infrastructure Monitoring**: Automatically analyze telemetry from servers, containers, or cloud instances.
-- **On‑Call Support**: Provide first‑line incident context and recommended actions to SREs.
-- **Runbook Automation**: Retrieves relevant operational procedures and presents them in a structured format.
-- **AIOps Playground**: A reference implementation for integrating RAG into IT operations workflows.
-- **Self‑Healing Systems**: Feed the structured output into automated remediation pipelines (e.g., Ansible, Kubernetes operators).
-
----
-
-## 🏗️ Architecture
+# Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Input
-        T[Telemetry Payload JSON]
+
+    Client["Client / Monitoring Agent"]
+
+    subgraph Platform["AI IT Operations Platform"]
+
+        API["FastAPI API"]
+
+        Engine["Anomaly Detection Engine"]
+
+        RAG["Runbook Retrieval"]
+
+        Synth["Incident Synthesizer"]
+
+        PG[("PostgreSQL")]
+
+        Redis[("Redis")]
+
     end
 
-    subgraph Processing
-        API[FastAPI Endpoint]
-        RE[Rule Engine<br/>Anomaly Detection]
-        VS[Vector Similarity Search<br/>ChromaDB]
-        RS[Incident Report Synthesizer]
+    Runbooks[("Operational Runbooks")]
+
+    subgraph Observability["Monitoring and Alerting"]
+
+        Prom["Prometheus"]
+
+        Grafana["Grafana Dashboard"]
+
+        Alerting["Grafana Alerting"]
+
+        Email["Email Notifications"]
+
     end
 
-    subgraph Data
-        RB[Runbook Knowledge Base<br/>Markdown Files]
-        VD[(Vector Database<br/>all-MiniLM-L6-v2)]
-    end
+    Client -->|"Telemetry"| API
 
-    subgraph Output
-        IR[Structured Incident Report JSON]
-    end
+    API --> Engine
 
-    T --> API
-    API --> RE
-    RE -->|Anomalies| VS
-    RB --> VD
-    VD --> VS
-    VS -->|Top K Runbooks| RS
-    RS --> IR
+    Engine --> RAG
+
+    RAG --> Runbooks
+
+    Engine --> Synth
+
+    RAG --> Synth
+
+    Synth -->|"Incident Report"| API
+
+    API --> PG
+
+    API --> Redis
+
+    API -->|"/metrics"| Prom
+
+    Prom --> Grafana
+
+    Grafana --> Alerting
+
+    Alerting --> Email
+
+    API -->|"Structured Response"| Client
 ```
-
-### Data Flow
-
-| Stage | Component | Description |
-|-------|-----------|-------------|
-| **Ingestion** | FastAPI Endpoint | Receives telemetry payload via POST `/api/v1/telemetry/analyze`. |
-| **Anomaly Detection** | Rule Engine | Evaluates metrics against defined thresholds; flags violations and service failures. |
-| **Context Retrieval** | ChromaDB + LangChain | Embeds anomaly signatures and retrieves top‑matching runbooks. |
-| **Report Synthesis** | Incident Synthesizer | Combines anomaly data and runbook context into a structured JSON incident report. |
-| **Output** | Incident Report | Returns severity, root cause, recommended actions, escalation path, and sources. |
 
 ---
 
-## ⚡ Key Features
+# Monitoring and Alerting Flow
 
-### 🔍 Automated Anomaly Detection
-- Monitors **CPU, RAM, Disk, service health**, and **HTTP endpoints**.
-- Configurable threshold rules (e.g., CPU > 90% triggers a **HIGH** severity alert).
-- Flags both threshold violations and service failures instantly.
+```text
+Infrastructure Telemetry
+        |
+        v
+FastAPI API
+        |
+        +----------------------+
+        |                      |
+        v                      v
+Anomaly Detection         /metrics
+        |                      |
+        v                      v
+Incident Analysis       Prometheus
+        |                      |
+        v                      v
+Incident Report         Grafana
+                               |
+                               v
+                        Dashboard Panels
+                               |
+                               v
+                        Alert Evaluation
+                               |
+                               v
+                        Notification Policy
+                               |
+                               v
+                        Email Notification
+```
 
-### 📚 RAG-Powered Runbook Retrieval
-- Embeds anomaly signatures using `all-MiniLM-L6-v2` via HuggingFace Transformers.
-- Stores and retrieves operational runbooks using **ChromaDB** vector store.
-- Returns the most relevant procedures with similarity scores for transparency.
+---
 
-### 📋 Structured Incident Reports
-- Strongly typed schemas using **Pydantic v2**.
-- Includes: incident title, severity, likely cause, recommended actions, escalation criteria, and sources consulted.
-- Predictable, machine‑readable output for integration with ticketing systems (Jira, ServiceNow) or automation tools.
+# Key Features
 
-### 🐳 Container‑Ready
-- Optimized Dockerfile with multi‑stage builds.
-- `docker-compose` support for local development and testing.
-- Minimal dependencies for a lightweight footprint.
+## Automated Anomaly Detection
 
-### 🧪 Test Coverage
-- Comprehensive `pytest` suite covering the rule engine, RAG retrieval, and API endpoints.
-- Sample telemetry payloads provided for manual testing.
+Configurable rules detect infrastructure conditions that require investigation.
+
+Currently supported signals include:
+
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* Service availability
+* HTTP endpoint failures
+
+## Runbook-Assisted Incident Analysis
+
+Detected anomalies can be matched against operational runbooks stored as Markdown documents.
+
+Current runbooks include:
+
+* High CPU utilization
+* Memory pressure
+* Disk and web server issues
+* Service outages
+
+The retrieval layer provides operational context without requiring the incident responder to manually search documentation.
+
+## Structured Incident Reports
+
+Incident responses use typed Pydantic models rather than unstructured text.
+
+This makes the output suitable for:
+
+* Monitoring integrations
+* Alerting pipelines
+* Incident-management systems
+* Automated remediation workflows
+* Future LLM-based summarization
+
+## REST API
+
+The FastAPI backend provides:
+
+* Telemetry analysis
+* Health checks
+* Readiness checks
+* Authentication endpoints
+* Prometheus metrics
+* OpenAPI documentation
+
+## Prometheus Monitoring
+
+The application exposes Prometheus-compatible metrics.
+
+Current infrastructure metrics include:
+
+```text
+itops_cpu_percent
+itops_ram_percent
+itops_disk_percent
+```
+
+Prometheus target availability can be queried with:
+
+```promql
+up{job="ai-it-ops"}
+```
+
+A value of `1` indicates that Prometheus considers the API target available.
+
+## Grafana Dashboard
+
+Grafana is configured as the visualization layer for the monitoring stack.
+
+The dashboard provides visibility into:
+
+* CPU utilization
+* RAM utilization
+* Disk utilization
+* API and service health
+* Request latency
+* Detected anomalies
+* Infrastructure state
+
+Prometheus is used as the Grafana data source.
+
+## Grafana Alerting
+
+Grafana-managed alert rules monitor the application metrics and operational signals.
+
+The current alert rules include:
+
+| Alert                     | Condition                                                   | Severity |
+| ------------------------- | ----------------------------------------------------------- | -------- |
+| High CPU Utilization      | CPU usage exceeds the configured threshold                  | Critical |
+| High RAM Utilization      | RAM usage exceeds the configured threshold                  | Critical |
+| Critical Disk Utilization | Disk usage exceeds 90%                                      | Critical |
+| High Request Latency      | 95th percentile request latency exceeds 1 second            | Critical |
+| Anomalies Detected        | One or more anomalies detected within the evaluation window | Critical |
+
+The alerts are evaluated by Grafana and routed through the configured notification policy.
+
+## Email Notifications
+
+Grafana Alerting is configured with an email contact point.
+
+The notification pipeline is:
+
+```text
+Grafana Alert Rule
+        |
+        v
+Grafana Alertmanager
+        |
+        v
+Notification Policy
+        |
+        v
+AI IT Operations Email Contact Point
+        |
+        v
+SMTP
+        |
+        v
+Email Notification
+```
+
+The alerting configuration has been verified through the Grafana Alertmanager API.
+
+The following alerts were successfully observed as active:
+
+* High Request Latency
+* Critical Disk Utilization
+* High RAM Utilization
+* Anomalies Detected
+* High CPU Utilization
+
+Grafana logs also confirmed successful email notification delivery.
+
+Example successful notification log:
+
+```text
+receiver="AI IT Operations Email"
+integration=email
+msg="Notify success"
+attempts=1
+```
+
+Resolved alert notifications were also successfully processed.
+
+## Docker Support
+
+Docker Compose provides a complete local development environment containing:
+
+* FastAPI
+* PostgreSQL
+* Redis
+* Prometheus
+* Grafana
+* Grafana alerting and notification configuration
+
+## Kubernetes Support
+
+Kubernetes manifests are provided for:
+
+* API deployment
+* API service
+* API configuration
+* API secrets
+* PostgreSQL
+* Redis
+* Prometheus
+* Persistent PostgreSQL storage
 
 ---
 
