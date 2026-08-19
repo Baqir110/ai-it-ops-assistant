@@ -1,0 +1,11 @@
+{
+  "service_name": "api-gateway-prod",
+  "metric_type": "cpu_usage",
+  "metric_value": 92.4,
+  "threshold": 80.0,
+  "status": "critical",
+  "metadata": {
+    "environment": "production",
+    "region": "eu-central-1"
+  }
+}

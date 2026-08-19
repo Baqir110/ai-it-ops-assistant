@@ -1,0 +1,17 @@
+# Git & local virtual environments
+.git
+.venv
+venv
+
+# Python cache & artifacts
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+htmlcov
+
+# Docker & local environment logs/data
+*.log
+.env

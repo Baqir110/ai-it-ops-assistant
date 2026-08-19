@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-it-ops-api
+  namespace: ai-it-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-it-ops-api
+  template:
+    metadata:
+      labels:
+        app: ai-it-ops-api
+    spec:
+      containers:
+        - name: api
+          image: ai-it-ops-assistant-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10

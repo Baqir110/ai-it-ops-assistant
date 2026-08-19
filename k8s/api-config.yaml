@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: ai-it-ops
+data:
+  LOG_LEVEL: "INFO"
+  VECTOR_STORE_PATH: "/app/data/vector_store"

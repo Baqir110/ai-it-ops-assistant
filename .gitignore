@@ -1,13 +1,45 @@
-venv/
-.venv/
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 *.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Environment and secrets
 .env
 .env.*
 !.env.example
+
+# IDEs
 .vscode/
 .idea/
+
+# OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Local application data
+data/chroma_db/
+data/vector_store/
+
+# Logs
+*.log
+
+# Docker image archives
+*.tar
+*.tar
+.env

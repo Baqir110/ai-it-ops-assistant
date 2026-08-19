@@ -1,0 +1,64 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: AI IT Operations
+      folder: ""
+      interval: 30s
+      rules:
+        - uid: bfvgpb1r1sdfkf
+          title: High CPU Utilization
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: afvgmr47xvvuob
+              model:
+                disableTextWrap: false
+                editorMode: builder
+                expr: itops_cpu_percent
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+                useBackend: false
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 90
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          annotations:
+            description: CPU utilization has remained above 90% for at least 1 minute.
+            summary: CPU utilization is critically high
+          labels:
+            Severity: ""
+          isPaused: false
+          notification_settings:
+            receiver: grafana-default-email
