@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-it-ops-api
+  namespace: ai-it-ops
+spec:
+  selector:
+    app: ai-it-ops-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

@@ -15,7 +15,8 @@ pytest
 httpx==0.28.1
 openai
 prometheus-client
-psycopg[binary]
+psycopg2-binary>=2.9.0
+psycopg[binary]>=3.1.0
 email-validator
 pwdlib[bcrypt]
 browser-use==0.12.6
