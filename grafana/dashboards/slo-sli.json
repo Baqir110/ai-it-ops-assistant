@@ -1,0 +1,59 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "OpsGuard — SLO / SLI",
+    "tags": ["opsguard", "slo"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "30s",
+    "time": {"from": "now-7d", "to": "now"},
+    "panels": [
+      {
+        "id": 1,
+        "title": "Availability SLO",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "targets": [{"expr": "opsguard_slo_measurements_total{slo=\"availability\",within_target=\"true\"} / opsguard_slo_measurements_total{slo=\"availability\"} * 100"}],
+        "fieldConfig": {"defaults": {"min": 95, "max": 100, "thresholds": {"steps": [{"color": "red", "value": 95}, {"color": "yellow", "value": 99}, {"color": "green", "value": 99.9}]}}}
+      },
+      {
+        "id": 2,
+        "title": "Error Rate SLO",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+        "targets": [{"expr": "opsguard_slo_measurements_total{slo=\"error_rate\",within_target=\"true\"} / opsguard_slo_measurements_total{slo=\"error_rate\"} * 100"}],
+        "fieldConfig": {"defaults": {"min": 95, "max": 100, "thresholds": {"steps": [{"color": "red", "value": 95}, {"color": "yellow", "value": 99}, {"color": "green", "value": 99.9}]}}}
+      },
+      {
+        "id": 3,
+        "title": "Latency SLO",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+        "targets": [{"expr": "opsguard_slo_measurements_total{slo=\"latency_p95\",within_target=\"true\"} / opsguard_slo_measurements_total{slo=\"latency_p95\"} * 100"}],
+        "fieldConfig": {"defaults": {"min": 95, "max": 100, "thresholds": {"steps": [{"color": "red", "value": 95}, {"color": "yellow", "value": 99}, {"color": "green", "value": 99.9}]}}}
+      },
+      {
+        "id": 4,
+        "title": "MTTD",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 0, "y": 8},
+        "targets": [{"expr": "opsguard_mttd_minutes"}]
+      },
+      {
+        "id": 5,
+        "title": "MTTR",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 8},
+        "targets": [{"expr": "opsguard_mttr_minutes"}]
+      },
+      {
+        "id": 6,
+        "title": "Incident Count (30d)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 8},
+        "targets": [{"expr": "sum(opsguard_incidents_created_total)"}]
+      }
+    ]
+  }
+}

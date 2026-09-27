@@ -1,0 +1,50 @@
+# Production values for OpsGuard
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/your-org/ai-it-ops-assistant
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+config:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  DATABASE_URL: "postgresql+psycopg://ops:ops@postgres:5432/ops"
+  REDIS_URL: "redis://redis:6379/0"
+  JWT_SECRET_KEY: ""  # Set via Kubernetes Secret
+  OPENAI_API_KEY: ""  # Set via Kubernetes Secret
+  PROMETHEUS_URL: "http://prometheus:9090"
+  PROMETHEUS_ENABLED: "true"
+  FAILURE_SIMULATOR_ENABLED: "false"
+  CPU_THRESHOLD: "85.0"
+  RAM_THRESHOLD: "85.0"
+  DISK_THRESHOLD: "90.0"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: opsguard.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: opsguard-tls
+      hosts:
+        - opsguard.yourdomain.com

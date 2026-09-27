@@ -1,42 +1,35 @@
-\# Runbook: Service Outage
+# Service Outage
 
+## Symptoms
+- Service unreachable
+- Health check failures
+- Connection timeouts
 
+## Evidence to Collect
+- Health check results
+- Service logs
+- Recent deployments
+- Dependency status
 
-\## Incident Indicators
+## Diagnosis
+1. Check if service process is running
+2. Verify network connectivity
+3. Check dependency services
+4. Review recent deployments
 
-\- Service status is DOWN or FAILED
+## Safe Actions
+- Check service status
+- Review logs
+- Verify dependencies
 
-\- HTTP endpoint returns 500, 502, or 503
+## Risky Actions
+- Restart the service (MEDIUM risk)
+- Rollback deployment (HIGH risk)
 
-\- Health checks are failing
+## Rollback Instructions
+- `kubectl rollout undo deployment/<name> -n <namespace>`
 
-
-
-\## Investigation Steps
-
-1\. Check the service status using `systemctl status <service>`.
-
-2\. Inspect recent application and system logs.
-
-3\. Verify network connectivity and dependent services.
-
-4\. Check CPU, memory, and disk resource availability.
-
-
-
-\## Remediation Steps
-
-1\. Restart the affected service using `systemctl restart <service>`.
-
-2\. Verify the service is active after restart.
-
-3\. Re-run the health check endpoint.
-
-4\. Roll back the most recent deployment if the outage began after a release.
-
-
-
-\## Escalation Criteria
-
-Escalate to the On-Call Infrastructure or Application Team if the service does not recover after restart or multiple services are affected.
-
+## Verification Steps
+- Health check returns 200
+- Service responds to requests
+- No new errors in logs

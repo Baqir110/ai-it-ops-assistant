@@ -1,0 +1,56 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "OpsGuard — Incident Overview",
+    "tags": ["opsguard", "incidents"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "30s",
+    "time": {"from": "now-24h", "to": "now"},
+    "panels": [
+      {
+        "id": 1,
+        "title": "Incidents by Severity",
+        "type": "barchart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [{"expr": "sum by (severity) (opsguard_incidents_created_total)"}]
+      },
+      {
+        "id": 2,
+        "title": "Incidents Created Over Time",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [{"expr": "rate(opsguard_incidents_created_total[1h])", "legendFormat": "{{severity}}"}]
+      },
+      {
+        "id": 3,
+        "title": "Incident Status Changes",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+        "targets": [{"expr": "rate(opsguard_incident_status_changes_total[5m])", "legendFormat": "{{from_status}} → {{to_status}}"}]
+      },
+      {
+        "id": 4,
+        "title": "Active Incidents",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 0, "y": 16},
+        "targets": [{"expr": "opsguard_active_incidents"}]
+      },
+      {
+        "id": 5,
+        "title": "Evidence Collections",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 8, "y": 16},
+        "targets": [{"expr": "rate(opsguard_evidence_collections_total[1h])"}]
+      },
+      {
+        "id": 6,
+        "title": "Diagnoses Created",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 8, "x": 16, "y": 16},
+        "targets": [{"expr": "rate(opsguard_diagnoses_created_total[1h])"}]
+      }
+    ]
+  }
+}

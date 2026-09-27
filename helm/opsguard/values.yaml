@@ -1,0 +1,108 @@
+# Default values for OpsGuard
+
+replicaCount: 1
+
+image:
+  repository: opsguard
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  fsGroup: 999
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: opsguard.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Application configuration
+config:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  DATABASE_URL: ""
+  REDIS_URL: ""
+  JWT_SECRET_KEY: ""
+  OPENAI_API_KEY: ""
+  PROMETHEUS_URL: "http://prometheus:9090"
+  PROMETHEUS_ENABLED: "true"
+  FAILURE_SIMULATOR_ENABLED: "false"
+  CPU_THRESHOLD: "85.0"
+  RAM_THRESHOLD: "85.0"
+  DISK_THRESHOLD: "90.0"
+
+# PostgreSQL
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: ops
+  username: ops
+  password: ops
+  storage: 5Gi
+
+# Redis
+redis:
+  enabled: true
+  image: redis:7-alpine
+  storage: 1Gi
+
+# Prometheus
+prometheus:
+  enabled: true
+  image: prom/prometheus:v3.5.0
+  storage: 10Gi
+
+# Grafana
+grafana:
+  enabled: true
+  image: grafana/grafana:12.1.0
+  adminUser: admin
+  adminPassword: admin
+  storage: 2Gi

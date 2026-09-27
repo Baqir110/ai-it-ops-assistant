@@ -1,0 +1,70 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "OpsGuard — Infrastructure Overview",
+    "tags": ["opsguard", "infrastructure"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "30s",
+    "time": {"from": "now-6h", "to": "now"},
+    "panels": [
+      {
+        "id": 1,
+        "title": "CPU Usage",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [{"expr": "opsguard_cpu_percent", "legendFormat": "CPU %"}]
+      },
+      {
+        "id": 2,
+        "title": "Memory Usage",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [{"expr": "opsguard_ram_percent", "legendFormat": "RAM %"}]
+      },
+      {
+        "id": 3,
+        "title": "Disk Usage",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [{"expr": "opsguard_disk_percent", "legendFormat": "Disk %"}]
+      },
+      {
+        "id": 4,
+        "title": "HTTP Check Latency",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [{"expr": "rate(opsguard_http_check_latency_seconds_sum[5m]) / rate(opsguard_http_check_latency_seconds_count[5m])", "legendFormat": "{{service}}"}]
+      },
+      {
+        "id": 5,
+        "title": "Active Incidents",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
+        "targets": [{"expr": "opsguard_active_incidents"}]
+      },
+      {
+        "id": 6,
+        "title": "MTTR",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 16},
+        "targets": [{"expr": "opsguard_mttr_minutes"}]
+      },
+      {
+        "id": 7,
+        "title": "MTTD",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 16},
+        "targets": [{"expr": "opsguard_mttd_minutes"}]
+      },
+      {
+        "id": 8,
+        "title": "Availability",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 16},
+        "targets": [{"expr": "opsguard_slo_measurements_total{slo=\"availability\",within_target=\"true\"} / opsguard_slo_measurements_total{slo=\"availability\"} * 100"}]
+      }
+    ]
+  }
+}

@@ -1,32 +1,47 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ai-it-ops-api
-  namespace: ai-it-ops
+  name: opsguard-api
+  namespace: opsguard
+  labels:
+    app: opsguard-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ai-it-ops-api
+      app: opsguard-api
   template:
     metadata:
       labels:
-        app: ai-it-ops-api
+        app: opsguard-api
     spec:
+      serviceAccountName: opsguard
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        fsGroup: 999
       containers:
         - name: api
-          image: ai-it-ops-assistant-api:latest
+          image: ghcr.io/your-org/opsguard:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
+              protocol: TCP
           envFrom:
             - configMapRef:
-                name: api-config
+                name: opsguard-config
             - secretRef:
-                name: api-secrets
+                name: opsguard-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ready
               port: 8000
             initialDelaySeconds: 10
             periodSeconds: 5
@@ -36,3 +51,22 @@ spec:
               port: 8000
             initialDelaySeconds: 30
             periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

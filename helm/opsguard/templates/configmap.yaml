@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "opsguard.fullname" . }}-config
+  labels:
+    {{- include "opsguard.labels" . | nindent 4 }}
+data:
+  ENVIRONMENT: {{ .Values.config.ENVIRONMENT | quote }}
+  LOG_LEVEL: {{ .Values.config.LOG_LEVEL | quote }}
+  PROMETHEUS_URL: {{ .Values.config.PROMETHEUS_URL | quote }}
+  PROMETHEUS_ENABLED: {{ .Values.config.PROMETHEUS_ENABLED | quote }}
+  FAILURE_SIMULATOR_ENABLED: {{ .Values.config.FAILURE_SIMULATOR_ENABLED | quote }}
+  CPU_THRESHOLD: {{ .Values.config.CPU_THRESHOLD | quote }}
+  RAM_THRESHOLD: {{ .Values.config.RAM_THRESHOLD | quote }}
+  DISK_THRESHOLD: {{ .Values.config.DISK_THRESHOLD | quote }}
+  VECTOR_STORE_PATH: "/app/data/chroma_db"
+  RUNBOOKS_PATH: "/app/data/runbooks"

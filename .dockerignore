@@ -1,17 +1,34 @@
-# Git & local virtual environments
 .git
-.venv
-venv
-
-# Python cache & artifacts
+.gitignore
+.github
 __pycache__
 *.pyc
 *.pyo
 *.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.venv
+venv
+env
+.env
 .pytest_cache
+.mypy_cache
+.ruff_cache
 .coverage
 htmlcov
-
-# Docker & local environment logs/data
+tests
+*.md
+!README.md
+!data/runbooks/*.md
+data/chroma_db
+data/vector_store
 *.log
-.env
+.DS_Store
+.idea
+.vscode
+*.swp
+*.swo

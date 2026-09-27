@@ -1,44 +1,36 @@
-\# Runbook: High Memory Utilization
+# Memory Pressure
 
+## Symptoms
+- Memory utilization exceeds 85%
+- OOMKilled events in Kubernetes
+- Application crashes or restarts
 
+## Evidence to Collect
+- Current memory usage
+- Memory usage trend
+- OOMKilled events
+- Recent deployments
 
-\## Incident Indicators
+## Diagnosis
+1. Check for memory leaks
+2. Verify memory limits are appropriate
+3. Check if memory spike correlates with deployment
+4. Identify memory-intensive processes
 
-\- RAM usage exceeding 85%
+## Safe Actions
+- Check memory usage trends
+- Review application logs for OOM events
+- Verify memory limits
 
-\- Memory usage continuously increasing
+## Risky Actions
+- Restart the service (MEDIUM risk)
+- Increase memory limits (MEDIUM risk)
 
-\- Out-of-memory errors
+## Rollback Instructions
+- If restart fails, rollback to previous deployment
+- Revert memory limit changes
 
-\- Application crashes or slow response times
-
-
-
-\## Investigation Steps
-
-1\. Identify memory-intensive processes using `top`, `htop`, or `ps aux --sort=-%mem`.
-
-2\. Check system logs for out-of-memory killer events.
-
-3\. Review application logs for memory leaks.
-
-4\. Check swap usage and available memory.
-
-
-
-\## Remediation Steps
-
-1\. Restart the process with abnormal memory consumption if safe.
-
-2\. Restart the affected application service.
-
-3\. Investigate potential memory leaks.
-
-4\. Increase available memory or scale the workload if required.
-
-
-
-\## Escalation Criteria
-
-Escalate to the Application or Infrastructure Team if memory usage remains above 95%, the system triggers OOM events, or services repeatedly crash.
-
+## Verification Steps
+- Memory usage drops below 85%
+- No new OOMKilled events
+- Application remains stable

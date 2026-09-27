@@ -1,0 +1,31 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "OpsGuard — Cost / Resource Efficiency",
+    "tags": ["opsguard", "cost"],
+    "timezone": "browser",
+    "schemaVersion": 39,
+    "version": 1,
+    "refresh": "5m",
+    "time": {"from": "now-7d", "to": "now"},
+    "panels": [
+      {
+        "id": 1,
+        "title": "Cost Recommendations by Category",
+        "type": "barchart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [{"expr": "sum by (category) (opsguard_cost_recommendations_total)"}]
+      },
+      {
+        "id": 2,
+        "title": "Resource Utilization",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {"expr": "opsguard_cpu_percent", "legendFormat": "CPU %"},
+          {"expr": "opsguard_ram_percent", "legendFormat": "RAM %"}
+        ]
+      }
+    ]
+  }
+}
