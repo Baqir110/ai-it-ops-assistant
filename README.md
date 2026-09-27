@@ -6,22 +6,22 @@ OpsGuard monitors infrastructure and services, detects operational incidents, co
 
 ## Problem
 
-Small and medium-sized organizations often lack dedicated SRE/DevOps teams. When services fail, engineers manually inspect metrics, logs, deployments, and infrastructure state — leading to slow detection, inconsistent response, no audit trail, and repeated incidents.
+Small and medium-sized organizations often lack dedicated SRE/DevOps teams. When services fail, engineers manually inspect metrics, logs, deployments, and infrastructure state : leading to slow detection, inconsistent response, no audit trail, and repeated incidents.
 
 ## Solution
 
 OpsGuard automates the complete incident lifecycle:
 
-* **Monitoring** — HTTP health checks, Prometheus metrics, Kubernetes pod status
-* **Detection** — Configurable thresholds for CPU, memory, disk, error rate, and latency
-* **Incident Management** — Full lifecycle from DETECTED to CLOSED with state machine validation
-* **Evidence Collection** — Automatic gathering of metrics, logs, health checks, and deployment information
-* **Diagnosis** — Deterministic rules with optional intelligent analysis over collected evidence
-* **Runbook Retrieval** — Semantic search over operational runbooks using ChromaDB
-* **Controlled Remediation** — Allowlisted actions only, with risk-based approval workflow
-* **Recovery Verification** — Automatic post-remediation health verification
-* **Audit Logging** — Complete trail of every action and state change
-* **SLO/SLI Monitoring** — Availability, error rate, latency, MTTD, and MTTR tracking
+* **Monitoring** : HTTP health checks, Prometheus metrics, Kubernetes pod status
+* **Detection** : Configurable thresholds for CPU, memory, disk, error rate, and latency
+* **Incident Management** : Full lifecycle from DETECTED to CLOSED with state machine validation
+* **Evidence Collection** : Automatic gathering of metrics, logs, health checks, and deployment information
+* **Diagnosis** : Deterministic rules with optional intelligent analysis over collected evidence
+* **Runbook Retrieval** : Semantic search over operational runbooks using ChromaDB
+* **Controlled Remediation** : Allowlisted actions only, with risk-based approval workflow
+* **Recovery Verification** : Automatic post-remediation health verification
+* **Audit Logging** : Complete trail of every action and state change
+* **SLO/SLI Monitoring** : Availability, error rate, latency, MTTD, and MTTR tracking
 
 ## Core Workflow
 
@@ -39,13 +39,13 @@ OpsGuard follows a layered reliability architecture designed around continuous o
 │                         OpsGuard Platform                           │
 ├─────────────────────────────────────────────────────────────────────┤
 │ API Layer (FastAPI)                                                 │
-│ ├── /api/v1/incidents    — Incident CRUD & lifecycle                │
-│ ├── /api/v1/services     — Service registry & health                │
-│ ├── /api/v1/remediation  — Remediation & approval workflow          │
-│ ├── /api/v1/slo          — SLO/SLI definitions & measurements       │
-│ ├── /api/v1/cost         — Cost optimization recommendations        │
-│ ├── /api/v1/audit        — Audit log                                │
-│ └── /api/v1/detection    — Detection events                         │
+│ ├── /api/v1/incidents    : Incident CRUD & lifecycle                │
+│ ├── /api/v1/services     : Service registry & health                │
+│ ├── /api/v1/remediation  : Remediation & approval workflow          │
+│ ├── /api/v1/slo          : SLO/SLI definitions & measurements       │
+│ ├── /api/v1/cost         : Cost optimization recommendations        │
+│ ├── /api/v1/audit        : Audit log                                │
+│ └── /api/v1/detection    : Detection events                         │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Domain Layer                                                        │
 │ ├── Incident lifecycle state machine (9 states)                     │
@@ -63,12 +63,12 @@ OpsGuard follows a layered reliability architecture designed around continuous o
 │ └── Cost Analyzer                                                   │
 ├─────────────────────────────────────────────────────────────────────┤
 │ Infrastructure Layer                                                │
-│ ├── PostgreSQL — Primary data store                                 │
-│ ├── Redis — Metric history & rate limiting                          │
-│ ├── Prometheus — Metrics collection                                 │
-│ ├── Grafana — Visualization & dashboards                            │
-│ ├── Loki — Log aggregation                                          │
-│ └── ChromaDB — Semantic runbook retrieval                           │
+│ ├── PostgreSQL : Primary data store                                 │
+│ ├── Redis : Metric history & rate limiting                          │
+│ ├── Prometheus : Metrics collection                                 │
+│ ├── Grafana : Visualization & dashboards                            │
+│ ├── Loki : Log aggregation                                          │
+│ └── ChromaDB : Semantic runbook retrieval                           │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -78,13 +78,13 @@ OpsGuard follows a layered reliability architecture designed around continuous o
 Detection → Incident → Evidence → Diagnosis → Remediation → Verification → Resolution
 ```
 
-1. **Detection** — HTTP health detector or Prometheus detector identifies an anomaly
-2. **Incident** — `IncidentService.process_detection_event()` creates an incident with a unique key
-3. **Evidence** — `EvidenceCollector` gathers health checks, detection events, and service information
-4. **Diagnosis** — `DiagnosisEngine` analyzes collected evidence using deterministic rules and optional intelligent analysis
-5. **Remediation** — Remediation is recommended based on diagnosis; risk level determines approval requirements
-6. **Verification** — `RecoveryVerifier` checks HTTP health, availability, and latency
-7. **Resolution** — Incident is marked RESOLVED only if verification succeeds
+1. **Detection** : HTTP health detector or Prometheus detector identifies an anomaly
+2. **Incident** : `IncidentService.process_detection_event()` creates an incident with a unique key
+3. **Evidence** : `EvidenceCollector` gathers health checks, detection events, and service information
+4. **Diagnosis** : `DiagnosisEngine` analyzes collected evidence using deterministic rules and optional intelligent analysis
+5. **Remediation** : Remediation is recommended based on diagnosis; risk level determines approval requirements
+6. **Verification** : `RecoveryVerifier` checks HTTP health, availability, and latency
+7. **Resolution** : Incident is marked RESOLVED only if verification succeeds
 
 All remediation actions go through the **allowlisted remediation registry**. The intelligence layer cannot execute arbitrary shell commands.
 
@@ -92,12 +92,12 @@ All remediation actions go through the **allowlisted remediation registry**. The
 
 OpsGuard includes an optional operational intelligence layer that enhances incident analysis while keeping the core execution path deterministic and controlled.
 
-* **Incident Classification** — Events classified by operational type such as `cpu_high` and `http_error_rate`
-* **Runbook Retrieval** — Semantic search over operational runbooks using ChromaDB and sentence-transformers
-* **Evidence-Based Diagnosis** — Optional external intelligence can analyze collected operational evidence to assist diagnosis
-* **Evidence Analysis** — Analysis is grounded in collected evidence rather than unrestricted system access
-* **Remediation Recommendation** — Recommendations are restricted to actions available through the allowlisted remediation registry
-* **Deterministic Fallback** — The platform remains fully operational using deterministic rules when no external intelligence provider is configured
+* **Incident Classification** : Events classified by operational type such as `cpu_high` and `http_error_rate`
+* **Runbook Retrieval** : Semantic search over operational runbooks using ChromaDB and sentence-transformers
+* **Evidence-Based Diagnosis** : Optional external intelligence can analyze collected operational evidence to assist diagnosis
+* **Evidence Analysis** : Analysis is grounded in collected evidence rather than unrestricted system access
+* **Remediation Recommendation** : Recommendations are restricted to actions available through the allowlisted remediation registry
+* **Deterministic Fallback** : The platform remains fully operational using deterministic rules when no external intelligence provider is configured
 
 The intelligence layer assists analysis; it does not control unrestricted infrastructure execution.
 
@@ -155,25 +155,25 @@ Every action is audited with `requested_by`, `approved_by`, timestamps, and exec
 
 ### Prometheus Metrics
 
-* `opsguard_incidents_created_total` — Incidents by severity
-* `opsguard_http_checks_total` — Health check results
-* `opsguard_active_incidents` — Currently active incidents
-* `opsguard_mttd_minutes` — Mean time to detect
-* `opsguard_mttr_minutes` — Mean time to resolve
-* `opsguard_slo_measurements_total` — SLO compliance measurements
-* `opsguard_remediation_actions_total` — Remediation outcomes
-* `opsguard_cost_recommendations_total` — Cost optimization findings
+* `opsguard_incidents_created_total` : Incidents by severity
+* `opsguard_http_checks_total` : Health check results
+* `opsguard_active_incidents` : Currently active incidents
+* `opsguard_mttd_minutes` : Mean time to detect
+* `opsguard_mttr_minutes` : Mean time to resolve
+* `opsguard_slo_measurements_total` : SLO compliance measurements
+* `opsguard_remediation_actions_total` : Remediation outcomes
+* `opsguard_cost_recommendations_total` : Cost optimization findings
 
 ### Grafana Dashboards
 
 Six dashboards are provisioned automatically:
 
-1. Infrastructure Overview — CPU, memory, disk, latency
-2. Incident Overview — Incidents by severity, status changes
-3. Service Reliability — Availability, error rate, p95 latency
-4. SLO/SLI — SLO compliance, MTTD, MTTR
-5. Remediation — Actions by type, success rate
-6. Cost/Resource Efficiency — Recommendations, utilization
+1. Infrastructure Overview : CPU, memory, disk, latency
+2. Incident Overview : Incidents by severity, status changes
+3. Service Reliability : Availability, error rate, p95 latency
+4. SLO/SLI : SLO compliance, MTTD, MTTR
+5. Remediation : Actions by type, success rate
+6. Cost/Resource Efficiency : Recommendations, utilization
 
 ### Structured Logging
 
@@ -193,16 +193,16 @@ All logs are JSON-formatted with timestamp, level, logger, message, module, requ
 
 ## Security
 
-* **Authentication** — JWT-based with bcrypt password hashing
-* **Authorization** — Role-based access control (Admin, Operator, Viewer)
-* **Non-root Containers** — Docker runs as UID 999
-* **Secret Management** — All secrets via environment variables or Kubernetes Secrets
-* **Input Validation** — Pydantic models on all endpoints
-* **Rate Limiting** — Configurable requests per minute per client
-* **Audit Logging** — Every action recorded with performer and timestamp
-* **CI Security** — Trivy container scanning and Gitleaks secret scanning
-* **Remediation Safety** — Allowlisted actions only; no arbitrary shell commands
-* **Operational Intelligence Safety** — Analysis is restricted to collected evidence and cannot directly execute infrastructure commands
+* **Authentication** : JWT-based with bcrypt password hashing
+* **Authorization** : Role-based access control (Admin, Operator, Viewer)
+* **Non-root Containers** : Docker runs as UID 999
+* **Secret Management** : All secrets via environment variables or Kubernetes Secrets
+* **Input Validation** : Pydantic models on all endpoints
+* **Rate Limiting** : Configurable requests per minute per client
+* **Audit Logging** : Every action recorded with performer and timestamp
+* **CI Security** : Trivy container scanning and Gitleaks secret scanning
+* **Remediation Safety** : Allowlisted actions only; no arbitrary shell commands
+* **Operational Intelligence Safety** : Analysis is restricted to collected evidence and cannot directly execute infrastructure commands
 
 ## Technology Stack
 
@@ -404,9 +404,9 @@ pytest tests/ --cov=app --cov-report=html
 
 ### Test Coverage
 
-* **Unit Tests** — Detectors, incident lifecycle, severity, diagnosis, remediation, SLO
-* **Integration Tests** — PostgreSQL, Redis, API endpoints, full incident workflow
-* **E2E Tests** — Complete lifecycle from detection to resolution
+* **Unit Tests** : Detectors, incident lifecycle, severity, diagnosis, remediation, SLO
+* **Integration Tests** : PostgreSQL, Redis, API endpoints, full incident workflow
+* **E2E Tests** : Complete lifecycle from detection to resolution
 
 ## Kubernetes
 
@@ -523,13 +523,13 @@ opsguard/
 
 ## Limitations
 
-* **Kubernetes Deployment** — Manifests and Helm chart are validated but require a running cluster for deployment
-* **Terraform** — Configuration is validated; AWS modules require cloud credentials and will incur costs
-* **Intelligent Analysis** — Optional external intelligence provider requires `OPENAI_API_KEY`; the platform operates fully without it using deterministic rules
-* **Loki** — Configuration is in place; requires Loki server for log aggregation
-* **OpenTelemetry** — Not currently instrumented; framework can be added
-* **AWS Cost Analysis** — Provider abstraction is implemented; requires AWS credentials for live data
-* **Failure Simulator** — Development-only; disabled in production via `FAILURE_SIMULATOR_ENABLED=false`
+* **Kubernetes Deployment** : Manifests and Helm chart are validated but require a running cluster for deployment
+* **Terraform** : Configuration is validated; AWS modules require cloud credentials and will incur costs
+* **Intelligent Analysis** : Optional external intelligence provider requires `OPENAI_API_KEY`; the platform operates fully without it using deterministic rules
+* **Loki** : Configuration is in place; requires Loki server for log aggregation
+* **OpenTelemetry** : Not currently instrumented; framework can be added
+* **AWS Cost Analysis** : Provider abstraction is implemented; requires AWS credentials for live data
+* **Failure Simulator** : Development-only; disabled in production via `FAILURE_SIMULATOR_ENABLED=false`
 
 ## Roadmap
 
