@@ -128,7 +128,7 @@ class TestRemediationRegistry:
         registry = create_default_registry()
         actions = registry.list_actions()
 
-        action_types = [a.action_type for a in actions]
+        action_types = actions
         assert "restart_service" in action_types
         assert "retry_health_check" in action_types
         assert "clear_cache" in action_types
@@ -143,14 +143,14 @@ class TestRemediationRegistry:
         registry = create_default_registry()
 
         # Low risk actions
-        assert not registry.get("retry_health_check").approval_required
-        assert not registry.get("clear_cache").approval_required
-        assert not registry.get("refresh_monitoring").approval_required
+        assert not registry.get("retry_health_check")["approval_required"]
+        assert not registry.get("clear_cache")["approval_required"]
+        assert not registry.get("refresh_monitoring")["approval_required"]
 
         # Medium/High risk actions
-        assert registry.get("restart_service").approval_required
-        assert registry.get("k8s_rollout_restart").approval_required
-        assert registry.get("rollback_deployment").approval_required
+        assert registry.get("restart_service")["approval_required"]
+        assert registry.get("k8s_rollout_restart")["approval_required"]
+        assert registry.get("rollback_deployment")["approval_required"]
 
     def test_rollback_capability(self):
         """Test rollback capability flags."""
@@ -158,9 +158,9 @@ class TestRemediationRegistry:
 
         registry = create_default_registry()
 
-        assert registry.get("rollback_deployment").rollback_capable
-        assert registry.get("k8s_rollout_restart").rollback_capable
-        assert not registry.get("restart_service").rollback_capable
+        assert registry.get("rollback_deployment")["rollback_capable"]
+        assert registry.get("k8s_rollout_restart")["rollback_capable"]
+        assert not registry.get("restart_service")["rollback_capable"]
 
 
 class TestSLOCalculator:
