@@ -6,22 +6,22 @@ OpsGuard monitors infrastructure and services, detects operational incidents, co
 
 ## Problem
 
-Small and medium-sized organizations often lack dedicated SRE/DevOps teams. When services fail, engineers manually inspect metrics, logs, deployments, and infrastructure state : leading to slow detection, inconsistent response, no audit trail, and repeated incidents.
+Small and medium-sized organizations often lack dedicated SRE/DevOps teams. When services fail, engineers manually inspect metrics, logs, deployments, and infrastructure state. That means slow detection, inconsistent response, no audit trail, and incidents that keep coming back.
 
 ## Solution
 
 OpsGuard automates the complete incident lifecycle:
 
-* **Monitoring** : HTTP health checks, Prometheus metrics, Kubernetes pod status
-* **Detection** : Configurable thresholds for CPU, memory, disk, error rate, and latency
-* **Incident Management** : Full lifecycle from DETECTED to CLOSED with state machine validation
-* **Evidence Collection** : Automatic gathering of metrics, logs, health checks, and deployment information
-* **Diagnosis** : Deterministic rules with optional intelligent analysis over collected evidence
-* **Runbook Retrieval** : Semantic search over operational runbooks using ChromaDB
-* **Controlled Remediation** : Allowlisted actions only, with risk-based approval workflow
-* **Recovery Verification** : Automatic post-remediation health verification
-* **Audit Logging** : Complete trail of every action and state change
-* **SLO/SLI Monitoring** : Availability, error rate, latency, MTTD, and MTTR tracking
+* Monitoring: HTTP health checks, Prometheus metrics, Kubernetes pod status
+* Detection: Configurable thresholds for CPU, memory, disk, error rate, and latency
+* Incident Management: Full lifecycle from DETECTED to CLOSED with state machine validation
+* Evidence Collection: Automatic gathering of metrics, logs, health checks, and deployment information
+* Diagnosis: Deterministic rules with optional intelligent analysis over collected evidence
+* Runbook Retrieval: Semantic search over operational runbooks using ChromaDB
+* Controlled Remediation: Allowlisted actions only, with risk-based approval workflow
+* Recovery Verification: Automatic post-remediation health verification
+* Audit Logging: Complete trail of every action and state change
+* SLO/SLI Monitoring: Availability, error rate, latency, MTTD, and MTTR tracking
 
 ## Core Workflow
 
@@ -31,7 +31,7 @@ Detect → Investigate → Diagnose → Remediate → Verify → Resolve
 
 ## Architecture
 
-OpsGuard follows a layered reliability architecture designed around continuous observation, deterministic incident handling, controlled remediation, recovery verification, and complete auditability.
+OpsGuard is built in layers: observation, deterministic incident handling, controlled remediation, recovery verification, and audit logging.
 
 ![OpsGuard Architecture](docs/architecture.png)
 ```text
@@ -78,28 +78,26 @@ OpsGuard follows a layered reliability architecture designed around continuous o
 Detection → Incident → Evidence → Diagnosis → Remediation → Verification → Resolution
 ```
 
-1. **Detection** : HTTP health detector or Prometheus detector identifies an anomaly
-2. **Incident** : `IncidentService.process_detection_event()` creates an incident with a unique key
-3. **Evidence** : `EvidenceCollector` gathers health checks, detection events, and service information
-4. **Diagnosis** : `DiagnosisEngine` analyzes collected evidence using deterministic rules and optional intelligent analysis
-5. **Remediation** : Remediation is recommended based on diagnosis; risk level determines approval requirements
-6. **Verification** : `RecoveryVerifier` checks HTTP health, availability, and latency
-7. **Resolution** : Incident is marked RESOLVED only if verification succeeds
+1. Detection: HTTP health detector or Prometheus detector identifies an anomaly
+2. Incident: `IncidentService.process_detection_event()` creates an incident with a unique key
+3. Evidence: `EvidenceCollector` gathers health checks, detection events, and service information
+4. Diagnosis: `DiagnosisEngine` analyzes collected evidence using deterministic rules and optional intelligent analysis
+5. Remediation: Remediation is recommended based on diagnosis; risk level determines approval requirements
+6. Verification: `RecoveryVerifier` checks HTTP health, availability, and latency
+7. Resolution: Incident is marked RESOLVED only if verification succeeds
 
 All remediation actions go through the **allowlisted remediation registry**. The intelligence layer cannot execute arbitrary shell commands.
 
 ## Operational Intelligence
 
-OpsGuard includes an optional operational intelligence layer that enhances incident analysis while keeping the core execution path deterministic and controlled.
+OpsGuard has an optional operational intelligence layer for deeper incident analysis. Core execution stays deterministic and controlled either way.
 
-* **Incident Classification** : Events classified by operational type such as `cpu_high` and `http_error_rate`
-* **Runbook Retrieval** : Semantic search over operational runbooks using ChromaDB and sentence-transformers
-* **Evidence-Based Diagnosis** : Optional external intelligence can analyze collected operational evidence to assist diagnosis
-* **Evidence Analysis** : Analysis is grounded in collected evidence rather than unrestricted system access
-* **Remediation Recommendation** : Recommendations are restricted to actions available through the allowlisted remediation registry
-* **Deterministic Fallback** : The platform remains fully operational using deterministic rules when no external intelligence provider is configured
-
-The intelligence layer assists analysis; it does not control unrestricted infrastructure execution.
+* Incident Classification: Events classified by operational type such as `cpu_high` and `http_error_rate`
+* Runbook Retrieval: Semantic search over operational runbooks using ChromaDB and sentence-transformers
+* Evidence-Based Diagnosis: Optional external intelligence can analyze collected operational evidence to assist diagnosis
+* Evidence Analysis: Analysis is grounded in collected evidence rather than unrestricted system access
+* Remediation Recommendation: Recommendations are restricted to actions available through the allowlisted remediation registry
+* Deterministic Fallback: The platform remains fully operational using deterministic rules when no external intelligence provider is configured
 
 ## Incident Lifecycle
 
@@ -193,21 +191,21 @@ All logs are JSON-formatted with timestamp, level, logger, message, module, requ
 
 ## Security
 
-* **Authentication** : JWT-based with bcrypt password hashing
-* **Authorization** : Role-based access control (Admin, Operator, Viewer)
-* **Non-root Containers** : Docker runs as UID 999
-* **Secret Management** : All secrets via environment variables or Kubernetes Secrets
-* **Input Validation** : Pydantic models on all endpoints
-* **Rate Limiting** : Configurable requests per minute per client
-* **Audit Logging** : Every action recorded with performer and timestamp
-* **CI Security** : Trivy container scanning and Gitleaks secret scanning
-* **Remediation Safety** : Allowlisted actions only; no arbitrary shell commands
-* **Operational Intelligence Safety** : Analysis is restricted to collected evidence and cannot directly execute infrastructure commands
+* Authentication: JWT-based with bcrypt password hashing
+* Authorization: Role-based access control (Admin, Operator, Viewer)
+* Non-root Containers: Docker runs as UID 999
+* Secret Management: All secrets via environment variables or Kubernetes Secrets
+* Input Validation: Pydantic models on all endpoints
+* Rate Limiting: Configurable requests per minute per client
+* Audit Logging: Every action recorded with performer and timestamp
+* CI Security: Trivy container scanning and Gitleaks secret scanning
+* Remediation Safety: Allowlisted actions only; no arbitrary shell commands
+* Operational Intelligence Safety: Analysis is restricted to collected evidence and cannot directly execute infrastructure commands
 
 ## Technology Stack
 
 | Layer           | Technology              |
-| --------------- | ----------------------- |
+| --------------- | ------------------------ |
 | Language        | Python 3.11+            |
 | API Framework   | FastAPI                 |
 | Database        | PostgreSQL 16           |
@@ -253,8 +251,8 @@ open http://localhost:8000
 
 ### Default Credentials
 
-* **Username**: `admin`
-* **Password**: `admin`
+* Username: `admin`
+* Password: `admin`
 
 **Change these immediately in production.**
 
@@ -282,14 +280,14 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### Health
 
 | Method | Path      | Description                                 |
-| ------ | --------- | ------------------------------------------- |
+| ------ | --------- | -------------------------------------------- |
 | GET    | `/health` | Liveness probe                              |
 | GET    | `/ready`  | Readiness probe (checks PostgreSQL + Redis) |
 
 ### Authentication
 
 | Method | Path                    | Description               |
-| ------ | ----------------------- | ------------------------- |
+| ------ | ----------------------- | -------------------------- |
 | POST   | `/api/v1/auth/register` | Register new user         |
 | POST   | `/api/v1/auth/login`    | Authenticate, returns JWT |
 | GET    | `/api/v1/auth/users/me` | Current user info         |
@@ -297,7 +295,7 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### Incidents
 
 | Method | Path                                 | Description                                    |
-| ------ | ------------------------------------ | ---------------------------------------------- |
+| ------ | ------------------------------------ | ----------------------------------------------- |
 | GET    | `/api/v1/incidents`                  | List incidents (filter by status, severity)    |
 | POST   | `/api/v1/incidents`                  | Create incident manually                       |
 | GET    | `/api/v1/incidents/{id}`             | Get incident details                           |
@@ -310,7 +308,7 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### Services
 
 | Method | Path                            | Description                     |
-| ------ | ------------------------------- | ------------------------------- |
+| ------ | -------------------------------- | -------------------------------- |
 | GET    | `/api/v1/services`              | List all services               |
 | POST   | `/api/v1/services`              | Register service for monitoring |
 | GET    | `/api/v1/services/{id}`         | Service details                 |
@@ -323,7 +321,7 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### Remediation
 
 | Method | Path                                         | Description             |
-| ------ | -------------------------------------------- | ----------------------- |
+| ------ | --------------------------------------------- | ------------------------ |
 | GET    | `/api/v1/remediation/actions`                | List available actions  |
 | POST   | `/api/v1/remediation/incidents/{id}/actions` | Request remediation     |
 | POST   | `/api/v1/remediation/actions/{id}/approve`   | Approve or reject       |
@@ -334,7 +332,7 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### SLO/SLI
 
 | Method | Path                      | Description           |
-| ------ | ------------------------- | --------------------- |
+| ------ | -------------------------- | ---------------------- |
 | GET    | `/api/v1/slo/definitions` | List SLO definitions  |
 | POST   | `/api/v1/slo/definitions` | Create SLO definition |
 | POST   | `/api/v1/slo/evaluate`    | Trigger evaluation    |
@@ -343,20 +341,20 @@ docker compose exec api alembic revision --autogenerate -m "description"
 ### Cost
 
 | Method | Path                           | Description          |
-| ------ | ------------------------------ | -------------------- |
+| ------ | -------------------------------- | ---------------------- |
 | GET    | `/api/v1/cost/recommendations` | List recommendations |
 | POST   | `/api/v1/cost/analyze`         | Run cost analysis    |
 
 ### Audit
 
 | Method | Path            | Description            |
-| ------ | --------------- | ---------------------- |
+| ------ | ---------------- | ------------------------ |
 | GET    | `/api/v1/audit` | List audit log entries |
 
 ### Detection
 
 | Method | Path                       | Description           |
-| ------ | -------------------------- | --------------------- |
+| ------ | --------------------------- | ---------------------- |
 | GET    | `/api/v1/detection/events` | List detection events |
 
 ## Failure Demonstration
@@ -404,9 +402,9 @@ pytest tests/ --cov=app --cov-report=html
 
 ### Test Coverage
 
-* **Unit Tests** : Detectors, incident lifecycle, severity, diagnosis, remediation, SLO
-* **Integration Tests** : PostgreSQL, Redis, API endpoints, full incident workflow
-* **E2E Tests** : Complete lifecycle from detection to resolution
+* Unit Tests: Detectors, incident lifecycle, severity, diagnosis, remediation, SLO
+* Integration Tests: PostgreSQL, Redis, API endpoints, full incident workflow
+* E2E Tests: Complete lifecycle from detection to resolution
 
 ## Kubernetes
 
@@ -523,13 +521,13 @@ opsguard/
 
 ## Limitations
 
-* **Kubernetes Deployment** : Manifests and Helm chart are validated but require a running cluster for deployment
-* **Terraform** : Configuration is validated; AWS modules require cloud credentials and will incur costs
-* **Intelligent Analysis** : Optional external intelligence provider requires `OPENAI_API_KEY`; the platform operates fully without it using deterministic rules
-* **Loki** : Configuration is in place; requires Loki server for log aggregation
-* **OpenTelemetry** : Not currently instrumented; framework can be added
-* **AWS Cost Analysis** : Provider abstraction is implemented; requires AWS credentials for live data
-* **Failure Simulator** : Development-only; disabled in production via `FAILURE_SIMULATOR_ENABLED=false`
+* Kubernetes Deployment: Manifests and Helm chart are validated but require a running cluster for deployment
+* Terraform: Configuration is validated; AWS modules require cloud credentials and will incur costs
+* Intelligent Analysis: Optional external intelligence provider requires `OPENAI_API_KEY`; the platform operates fully without it using deterministic rules
+* Loki: Configuration is in place; requires Loki server for log aggregation
+* OpenTelemetry: Not currently instrumented; framework can be added
+* AWS Cost Analysis: Provider abstraction is implemented; requires AWS credentials for live data
+* Failure Simulator: Development-only; disabled in production via `FAILURE_SIMULATOR_ENABLED=false`
 
 ## Roadmap
 
