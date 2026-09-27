@@ -55,11 +55,13 @@ class AIDiagnosisService:
             # This is passed via the incident's evidence relationship
             evidence_items = []
             for ev in incident.evidence:
-                evidence_items.append({
-                    "type": ev.evidence_type,
-                    "source": ev.source,
-                    "content": ev.content[:500],  # Truncate for token limits
-                })
+                evidence_items.append(
+                    {
+                        "type": ev.evidence_type,
+                        "source": ev.source,
+                        "content": ev.content[:500],  # Truncate for token limits
+                    }
+                )
 
             if not evidence_items:
                 logger.warning("No evidence available for AI diagnosis")

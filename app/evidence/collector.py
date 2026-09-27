@@ -83,15 +83,15 @@ class EvidenceCollector:
         total = len(recent)
         failures = sum(1 for c in recent if not c.available)
         avg_latency = (
-            sum(c.latency_ms for c in recent if c.latency_ms) / total
-            if total
-            else 0
+            sum(c.latency_ms for c in recent if c.latency_ms) / total if total else 0
         )
 
         summary = {
             "total_checks": total,
             "failures": failures,
-            "availability_pct": round(((total - failures) / total) * 100, 1) if total else 100,
+            "availability_pct": (
+                round(((total - failures) / total) * 100, 1) if total else 100
+            ),
             "avg_latency_ms": round(avg_latency, 1),
             "first_failure": next(
                 (c.checked_at.isoformat() for c in recent if not c.available), None
@@ -117,9 +117,14 @@ class EvidenceCollector:
 
         events = get_detection_events(self._db, limit=10)
         related = [
-            e for e in events
-            if e.service == (get_service(self._db, incident.affected_service_id).name
-                           if incident.affected_service_id else None)
+            e
+            for e in events
+            if e.service
+            == (
+                get_service(self._db, incident.affected_service_id).name
+                if incident.affected_service_id
+                else None
+            )
         ]
 
         if not related:

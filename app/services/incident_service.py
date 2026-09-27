@@ -90,6 +90,7 @@ class IncidentService:
             else:
                 # Auto-register the service if it doesn't exist
                 from app.database.repositories import create_service
+
                 service = create_service(
                     self._db,
                     name=event.service,
@@ -313,7 +314,10 @@ class IncidentService:
                 incident_id=incident_id,
                 event_type="remediation_recommended",
                 message=f"Remediation recommended: {action_type}",
-                metadata={"action_id": action.id, "risk_level": action_def["risk_level"].value},
+                metadata={
+                    "action_id": action.id,
+                    "risk_level": action_def["risk_level"].value,
+                },
             )
 
         logger.info(

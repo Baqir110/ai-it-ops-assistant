@@ -13,7 +13,17 @@ from fastapi.staticfiles import StaticFiles
 from prometheus_client import make_asgi_app
 from sqlalchemy import text
 
-from app.api.v1 import audit, auth, cost, detection, incidents, remediation, services, simulator, slo
+from app.api.v1 import (
+    audit,
+    auth,
+    cost,
+    detection,
+    incidents,
+    remediation,
+    services,
+    simulator,
+    slo,
+)
 from app.api.endpoints import router as legacy_api_router
 from app.config.settings import settings
 from app.database import Base, engine
@@ -36,7 +46,9 @@ _scheduler: Scheduler | None = None
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     # Startup
-    logger.info("OpsGuard %s starting in %s mode", settings.APP_VERSION, settings.ENVIRONMENT)
+    logger.info(
+        "OpsGuard %s starting in %s mode", settings.APP_VERSION, settings.ENVIRONMENT
+    )
 
     # Create default admin user if it doesn't exist
     from app.database.connection import SessionLocal
@@ -49,6 +61,7 @@ async def lifespan(app: FastAPI):
         admin = get_user_by_username(db, settings.DEFAULT_ADMIN_USERNAME)
         if not admin:
             from app.database.repositories import create_user
+
             create_user(
                 db=db,
                 username=settings.DEFAULT_ADMIN_USERNAME,
@@ -97,6 +110,7 @@ app.add_middleware(
     requests_per_minute=settings.RATE_LIMIT_REQUESTS_PER_MINUTE,
 )
 
+
 # Security headers middleware
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -104,7 +118,9 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=31536000; includeSubDomains"
+    )
     return response
 
 
@@ -232,7 +248,9 @@ async def root():
     if os.path.exists(static_path):
         with open(static_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>OpsGuard</h1><p>Dashboard not found. Build the frontend first.</p>")
+    return HTMLResponse(
+        content="<h1>OpsGuard</h1><p>Dashboard not found. Build the frontend first.</p>"
+    )
 
 
 if __name__ == "__main__":

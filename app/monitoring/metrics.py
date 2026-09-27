@@ -39,7 +39,9 @@ PROMETHEUS_DETECTIONS = Counter(
 
 # --- Incident Lifecycle Metrics ---
 INCIDENT_STATUS_CHANGES = Counter(
-    "opsguard_incident_status_changes_total", "Incident status changes", ["from_status", "to_status"]
+    "opsguard_incident_status_changes_total",
+    "Incident status changes",
+    ["from_status", "to_status"],
 )
 EVIDENCE_COLLECTIONS = Counter(
     "opsguard_evidence_collections_total", "Evidence items collected"
@@ -48,7 +50,9 @@ DIAGNOSES_CREATED = Counter(
     "opsguard_diagnoses_created_total", "Total diagnoses created"
 )
 REMEDIATION_ACTIONS = Counter(
-    "opsguard_remediation_actions_total", "Remediation actions", ["action_type", "result"]
+    "opsguard_remediation_actions_total",
+    "Remediation actions",
+    ["action_type", "result"],
 )
 VERIFICATION_RUNS = Counter(
     "opsguard_verification_runs_total", "Recovery verification runs"

@@ -28,20 +28,25 @@ from app.database.models import (
     User,
 )
 
-
 # ── Users ──────────────────────────────────────────────────────────────
 
 
 def get_user_by_username(db: Session, username: str) -> User | None:
-    return db.execute(select(User).where(User.username == username)).scalar_one_or_none()
+    return db.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
 
 
 def get_user_by_id(db: Session, user_id: str) -> User | None:
     return db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
 
 
-def create_user(db: Session, username: str, email: str, hashed_password: str, role: str) -> User:
-    user = User(username=username, email=email, hashed_password=hashed_password, role=role)
+def create_user(
+    db: Session, username: str, email: str, hashed_password: str, role: str
+) -> User:
+    user = User(
+        username=username, email=email, hashed_password=hashed_password, role=role
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -145,14 +150,18 @@ def save_service_check(
     if service:
         service.last_health_check = datetime.now(timezone.utc)
         service.health_status = "healthy" if available else "unhealthy"
-        service.consecutive_failures = 0 if available else service.consecutive_failures + 1
+        service.consecutive_failures = (
+            0 if available else service.consecutive_failures + 1
+        )
 
     db.commit()
     db.refresh(check)
     return check
 
 
-def get_recent_checks(db: Session, service_id: int, limit: int = 50) -> list[ServiceCheck]:
+def get_recent_checks(
+    db: Session, service_id: int, limit: int = 50
+) -> list[ServiceCheck]:
     return db.scalars(
         select(ServiceCheck)
         .where(ServiceCheck.service_id == service_id)
@@ -161,12 +170,16 @@ def get_recent_checks(db: Session, service_id: int, limit: int = 50) -> list[Ser
     ).all()
 
 
-def get_service_availability(db: Session, service_id: int, window_minutes: int = 60) -> float:
+def get_service_availability(
+    db: Session, service_id: int, window_minutes: int = 60
+) -> float:
     """Calculate availability percentage over a time window."""
     since = datetime.now(timezone.utc) - timedelta(minutes=window_minutes)
     total = db.scalar(
         select(func.count(ServiceCheck.id)).where(
-            and_(ServiceCheck.service_id == service_id, ServiceCheck.checked_at >= since)
+            and_(
+                ServiceCheck.service_id == service_id, ServiceCheck.checked_at >= since
+            )
         )
     )
     if not total:
@@ -219,7 +232,9 @@ def get_detection_events(
     service: str | None = None,
     event_type: str | None = None,
 ) -> list[DetectionEvent]:
-    stmt = select(DetectionEvent).order_by(DetectionEvent.created_at.desc()).limit(limit)
+    stmt = (
+        select(DetectionEvent).order_by(DetectionEvent.created_at.desc()).limit(limit)
+    )
     if service:
         stmt = stmt.where(DetectionEvent.service == service)
     if event_type:
@@ -253,11 +268,15 @@ def _generate_incident_key(db: Session) -> str:
     """Generate a unique incident key like INC-2026-0001."""
     year = datetime.now(timezone.utc).year
     prefix = f"INC-{year}-"
-    latest = db.execute(
-        select(Incident.incident_key).where(
-            Incident.incident_key.like(f"{prefix}%")
-        ).order_by(Incident.incident_key.desc())
-    ).scalars().first()
+    latest = (
+        db.execute(
+            select(Incident.incident_key)
+            .where(Incident.incident_key.like(f"{prefix}%"))
+            .order_by(Incident.incident_key.desc())
+        )
+        .scalars()
+        .first()
+    )
     if latest:
         try:
             seq = int(latest.split("-")[-1]) + 1
@@ -339,7 +358,9 @@ def update_incident_status(
     if status == IncidentStatus.CLOSED.value and not incident.closed_at:
         incident.closed_at = now
     if incident.detected_at and incident.resolved_at:
-        incident.duration = (incident.resolved_at - incident.detected_at).total_seconds()
+        incident.duration = (
+            incident.resolved_at - incident.detected_at
+        ).total_seconds()
     db.commit()
     db.refresh(incident)
     return incident
@@ -518,7 +539,9 @@ def list_remediation_actions(db: Session, incident_id: int) -> list[RemediationA
     ).all()
 
 
-def update_remediation_action(db: Session, action_id: int, **kwargs) -> RemediationAction:
+def update_remediation_action(
+    db: Session, action_id: int, **kwargs
+) -> RemediationAction:
     action = db.get(RemediationAction, action_id)
     if not action:
         raise ValueError(f"Remediation action {action_id} not found")
@@ -552,7 +575,9 @@ def save_remediation_execution(
 # ── SLO ────────────────────────────────────────────────────────────────
 
 
-def list_slo_definitions(db: Session, include_disabled: bool = False) -> list[SLODefinition]:
+def list_slo_definitions(
+    db: Session, include_disabled: bool = False
+) -> list[SLODefinition]:
     stmt = select(SLODefinition).order_by(SLODefinition.name)
     if not include_disabled:
         stmt = stmt.where(SLODefinition.is_enabled.is_(True))
@@ -633,7 +658,9 @@ def create_runbook(
     content: str,
     **kwargs,
 ) -> Runbook:
-    runbook = Runbook(key=key, title=title, category=category, content=content, **kwargs)
+    runbook = Runbook(
+        key=key, title=title, category=category, content=content, **kwargs
+    )
     db.add(runbook)
     db.commit()
     db.refresh(runbook)
@@ -715,7 +742,11 @@ def save_cost_recommendation(
 def list_cost_recommendations(
     db: Session, status: str | None = None, limit: int = 100
 ) -> list[CostRecommendation]:
-    stmt = select(CostRecommendation).order_by(CostRecommendation.created_at.desc()).limit(limit)
+    stmt = (
+        select(CostRecommendation)
+        .order_by(CostRecommendation.created_at.desc())
+        .limit(limit)
+    )
     if status:
         stmt = stmt.where(CostRecommendation.status == status)
     return db.scalars(stmt).all()

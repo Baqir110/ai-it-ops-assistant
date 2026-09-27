@@ -85,17 +85,21 @@ def list_available_actions(
     result = []
     for action_type in actions:
         a = registry.get(action_type)
-        result.append({
-            "action_type": action_type,
-            "risk_level": a["risk_level"].value,
-            "approval_required": a["approval_required"],
-            "rollback_capable": a["rollback_capable"],
-            "description": a["description"],
-        })
+        result.append(
+            {
+                "action_type": action_type,
+                "risk_level": a["risk_level"].value,
+                "approval_required": a["approval_required"],
+                "rollback_capable": a["rollback_capable"],
+                "description": a["description"],
+            }
+        )
     return result
 
 
-@router.post("/incidents/{incident_id}/actions", response_model=RemediationActionResponse)
+@router.post(
+    "/incidents/{incident_id}/actions", response_model=RemediationActionResponse
+)
 def request_remediation(
     incident_id: int,
     request: RemediationRequest,
@@ -263,7 +267,8 @@ def execute_remediation_action(
         output = result.get("output", "")
 
         action_status = (
-            RemediationActionStatus.COMPLETED.value if success
+            RemediationActionStatus.COMPLETED.value
+            if success
             else RemediationActionStatus.FAILED.value
         )
         action_result = "success" if success else "failed"
@@ -347,7 +352,9 @@ def rollback_remediation_action(
         raise HTTPException(status_code=400, detail="Action does not support rollback")
 
     if action.rollback_executed:
-        raise HTTPException(status_code=400, detail="Action has already been rolled back")
+        raise HTTPException(
+            status_code=400, detail="Action has already been rolled back"
+        )
 
     update_remediation_action(
         db,
@@ -374,7 +381,9 @@ def rollback_remediation_action(
     return get_remediation_action(db, action_id)
 
 
-@router.get("/incidents/{incident_id}/actions", response_model=list[RemediationActionResponse])
+@router.get(
+    "/incidents/{incident_id}/actions", response_model=list[RemediationActionResponse]
+)
 def get_incident_remediation_actions(
     incident_id: int,
     db: Session = Depends(get_db),

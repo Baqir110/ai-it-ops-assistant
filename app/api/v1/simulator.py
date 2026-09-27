@@ -61,7 +61,13 @@ async def trigger_simulation(
         raise HTTPException(status_code=409, detail="Simulation already running")
 
     task = asyncio.create_task(
-        _run_simulation(sim_id, request.simulation_type, request.duration_seconds, request.target_service, db)
+        _run_simulation(
+            sim_id,
+            request.simulation_type,
+            request.duration_seconds,
+            request.target_service,
+            db,
+        )
     )
     _active_simulations[sim_id] = task
 
@@ -108,7 +114,9 @@ async def _run_simulation(
     db: Session,
 ):
     """Run a failure simulation in the background."""
-    logger.warning("Starting failure simulation: %s (duration: %ds)", sim_type, duration)
+    logger.warning(
+        "Starting failure simulation: %s (duration: %ds)", sim_type, duration
+    )
 
     try:
         if sim_type == "http_500":
@@ -157,7 +165,9 @@ async def _simulate_http_500(duration: int, target_service: str | None, db: Sess
         await asyncio.sleep(5)
 
 
-async def _simulate_latency_spike(duration: int, target_service: str | None, db: Session):
+async def _simulate_latency_spike(
+    duration: int, target_service: str | None, db: Session
+):
     """Simulate latency spike by recording high-latency health checks."""
     from datetime import datetime, timezone
 
@@ -201,7 +211,9 @@ async def _simulate_memory_pressure(duration: int):
         chunks.clear()
 
 
-async def _simulate_bad_deployment(duration: int, target_service: str | None, db: Session):
+async def _simulate_bad_deployment(
+    duration: int, target_service: str | None, db: Session
+):
     """Simulate a bad deployment by recording failed checks and updating service metadata."""
     from datetime import datetime, timezone
 
@@ -230,7 +242,9 @@ async def _simulate_failed_backup(duration: int):
     await asyncio.sleep(duration)
 
 
-async def _simulate_container_crash(duration: int, target_service: str | None, db: Session):
+async def _simulate_container_crash(
+    duration: int, target_service: str | None, db: Session
+):
     """Simulate container crash by recording failed checks."""
     from datetime import datetime, timezone
 

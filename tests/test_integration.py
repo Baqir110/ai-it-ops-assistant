@@ -12,6 +12,7 @@ client = TestClient(app)
 def auth_token():
     """Get an auth token for API calls."""
     import uuid
+
     username = f"integuser_{uuid.uuid4().hex[:8]}"
     client.post(
         "/api/v1/auth/register",
@@ -188,6 +189,7 @@ class TestServiceAPI:
     def test_create_and_list_service(self, auth_token):
         """Test creating and listing a service."""
         import uuid
+
         name = f"test-svc-{uuid.uuid4().hex[:8]}"
 
         # Create
@@ -208,6 +210,7 @@ class TestServiceAPI:
     def test_disable_enable_service(self, auth_token):
         """Test disabling and enabling a service."""
         import uuid
+
         name = f"test-svc-{uuid.uuid4().hex[:8]}"
 
         # Create

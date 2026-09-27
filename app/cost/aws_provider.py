@@ -96,8 +96,16 @@ class AWSCostProvider(CostProvider):
                 response = self._pricing_client.get_products(
                     ServiceCode="AmazonEC2",
                     Filters=[
-                        {"Type": "TERM_MATCH", "Field": "instanceType", "Value": "t3.medium"},
-                        {"Type": "TERM_MATCH", "Field": "location", "Value": "US East (N. Virginia)"},
+                        {
+                            "Type": "TERM_MATCH",
+                            "Field": "instanceType",
+                            "Value": "t3.medium",
+                        },
+                        {
+                            "Type": "TERM_MATCH",
+                            "Field": "location",
+                            "Value": "US East (N. Virginia)",
+                        },
                     ],
                 )
                 if response.get("PriceList"):
@@ -138,17 +146,19 @@ class AWSCostProvider(CostProvider):
 
                     # Recommend downsizing if CPU < 25%
                     if avg_cpu < 25:
-                        recommendations.append({
-                            "resource_name": instance_id,
-                            "resource_type": "ec2_instance",
-                            "current_type": instance_type,
-                            "avg_cpu_percent": avg_cpu,
-                            "recommendation": (
-                                f"Instance {instance_id} ({instance_type}) has "
-                                f"average CPU of {avg_cpu:.1f}%. Consider downsizing."
-                            ),
-                            "category": "rightsizing",
-                        })
+                        recommendations.append(
+                            {
+                                "resource_name": instance_id,
+                                "resource_type": "ec2_instance",
+                                "current_type": instance_type,
+                                "avg_cpu_percent": avg_cpu,
+                                "recommendation": (
+                                    f"Instance {instance_id} ({instance_type}) has "
+                                    f"average CPU of {avg_cpu:.1f}%. Consider downsizing."
+                                ),
+                                "category": "rightsizing",
+                            }
+                        )
 
         except Exception as e:
             logger.debug("Failed to get AWS cost recommendations: %s", e)

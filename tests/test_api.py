@@ -12,6 +12,7 @@ client = TestClient(app)
 def auth_token():
     """Get an auth token for API calls."""
     import uuid
+
     username = f"apiuser_{uuid.uuid4().hex[:8]}"
     client.post(
         "/api/v1/auth/register",
@@ -169,7 +170,10 @@ def test_service_outage_incident(auth_token):
 
     data = response.json()
 
-    assert "Service outage" in data["likely_cause"] or "outage" in data["likely_cause"].lower()
+    assert (
+        "Service outage" in data["likely_cause"]
+        or "outage" in data["likely_cause"].lower()
+    )
     assert len(data["recommended_actions"]) > 0
 
 

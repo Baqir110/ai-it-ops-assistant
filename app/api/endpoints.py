@@ -31,6 +31,7 @@ router = APIRouter()
 
 class SystemTelemetry(BaseModel):
     """Legacy telemetry payload format."""
+
     cpu_percent: float = Field(..., ge=0.0, le=100.0)
     ram_percent: float = Field(..., ge=0.0, le=100.0)
     disk_percent: float = Field(..., ge=0.0, le=100.0)
@@ -40,6 +41,7 @@ class SystemTelemetry(BaseModel):
 
 class IncidentReport(BaseModel):
     """Legacy incident report format."""
+
     incident_title: str
     severity: str
     likely_cause: str
@@ -94,13 +96,20 @@ def analyze_telemetry(
             from app.database.models import SeverityLevel
             from app.domain.severity import severity_from_value
 
-            max_value = max(telemetry.cpu_percent, telemetry.ram_percent, telemetry.disk_percent)
+            max_value = max(
+                telemetry.cpu_percent, telemetry.ram_percent, telemetry.disk_percent
+            )
             severity = severity_from_value(max_value, 85.0)
 
             # Persist incident
-            from app.database.repositories import create_incident, find_open_incident_for_service
+            from app.database.repositories import (
+                create_incident,
+                find_open_incident_for_service,
+            )
 
-            existing = find_open_incident_for_service(db, None, event_type="telemetry_anomaly")
+            existing = find_open_incident_for_service(
+                db, None, event_type="telemetry_anomaly"
+            )
             if not existing:
                 create_incident(
                     db,
@@ -120,7 +129,8 @@ def analyze_telemetry(
                     "Inspect system and application logs for critical errors.",
                     "Verify process states and resource consumption.",
                 ],
-                escalation_required=severity in {SeverityLevel.HIGH, SeverityLevel.CRITICAL},
+                escalation_required=severity
+                in {SeverityLevel.HIGH, SeverityLevel.CRITICAL},
                 escalation_criteria="Escalate if metrics do not improve after initial investigation.",
             )
 

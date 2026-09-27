@@ -66,7 +66,9 @@ def register(user_data: RegisterRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
     """Authenticate and return a JWT token."""
     user = get_user_by_username(db, form_data.username)
 
@@ -94,9 +96,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     update_last_login(db, user)
 
-    access_token = create_access_token(
-        data={"sub": user.username, "role": user.role}
-    )
+    access_token = create_access_token(data={"sub": user.username, "role": user.role})
 
     return {"access_token": access_token, "token_type": "bearer"}
 

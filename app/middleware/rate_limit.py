@@ -25,7 +25,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._clients: dict[str, list[float]] = defaultdict(list)
 
     async def dispatch(self, request: Request, call_next):
-        if not settings.RATE_LIMIT_ENABLED or not settings.RATE_LIMIT_REQUESTS_PER_MINUTE:
+        if (
+            not settings.RATE_LIMIT_ENABLED
+            or not settings.RATE_LIMIT_REQUESTS_PER_MINUTE
+        ):
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"
@@ -33,8 +36,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Clean old entries
         self._clients[client_ip] = [
-            t for t in self._clients[client_ip]
-            if now - t < self._window_seconds
+            t for t in self._clients[client_ip] if now - t < self._window_seconds
         ]
 
         # Check limit

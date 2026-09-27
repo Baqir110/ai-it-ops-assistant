@@ -13,6 +13,7 @@ def setup_user():
     """Ensure a test user exists before each test."""
     # Register a unique user for each test
     import uuid
+
     username = f"testuser_{uuid.uuid4().hex[:8]}"
     client.post(
         "/api/v1/auth/register",
@@ -29,6 +30,7 @@ def setup_user():
 def test_register_user(setup_user):
     """Test user registration."""
     import uuid
+
     username = f"newuser_{uuid.uuid4().hex[:8]}"
     response = client.post(
         "/api/v1/auth/register",

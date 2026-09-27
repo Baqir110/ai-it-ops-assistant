@@ -140,17 +140,19 @@ class CostAnalyzer:
             if utilization_ratio < 0.25:
                 # Using less than 25% of requested CPU
                 recommended = max(int(cpu_avg * 2), 100)  # 2x headroom, min 100m
-                recommendations.append(CostRecommendation(
-                    resource_name=service.name,
-                    resource_type="kubernetes_deployment",
-                    current_request=float(cpu_request),
-                    observed_average=float(cpu_avg),
-                    recommendation=(
-                        f"Reduce CPU request from {cpu_request}m to ~{recommended}m. "
-                        f"Observed average: {cpu_avg}m ({utilization_ratio:.0%} utilization)."
-                    ),
-                    category="cpu_rightsizing",
-                ))
+                recommendations.append(
+                    CostRecommendation(
+                        resource_name=service.name,
+                        resource_type="kubernetes_deployment",
+                        current_request=float(cpu_request),
+                        observed_average=float(cpu_avg),
+                        recommendation=(
+                            f"Reduce CPU request from {cpu_request}m to ~{recommended}m. "
+                            f"Observed average: {cpu_avg}m ({utilization_ratio:.0%} utilization)."
+                        ),
+                        category="cpu_rightsizing",
+                    )
+                )
 
         # Check for memory rightsizing opportunity
         mem_request = metadata.get("memory_request_mb")
@@ -160,17 +162,19 @@ class CostAnalyzer:
             utilization_ratio = mem_avg / mem_request
             if utilization_ratio < 0.25:
                 recommended = max(int(mem_avg * 2), 128)  # 2x headroom, min 128MB
-                recommendations.append(CostRecommendation(
-                    resource_name=service.name,
-                    resource_type="kubernetes_deployment",
-                    current_request=float(mem_request),
-                    observed_average=float(mem_avg),
-                    recommendation=(
-                        f"Reduce memory request from {mem_request}MB to ~{recommended}MB. "
-                        f"Observed average: {mem_avg}MB ({utilization_ratio:.0%} utilization)."
-                    ),
-                    category="memory_rightsizing",
-                ))
+                recommendations.append(
+                    CostRecommendation(
+                        resource_name=service.name,
+                        resource_type="kubernetes_deployment",
+                        current_request=float(mem_request),
+                        observed_average=float(mem_avg),
+                        recommendation=(
+                            f"Reduce memory request from {mem_request}MB to ~{recommended}MB. "
+                            f"Observed average: {mem_avg}MB ({utilization_ratio:.0%} utilization)."
+                        ),
+                        category="memory_rightsizing",
+                    )
+                )
 
         # Check for idle services
         availability = utilization.get("availability", 100)
@@ -178,17 +182,19 @@ class CostAnalyzer:
         if check_count > 10 and availability == 100:
             avg_latency = utilization.get("avg_latency_ms", 0)
             if avg_latency < 10:  # Very low latency = likely idle
-                recommendations.append(CostRecommendation(
-                    resource_name=service.name,
-                    resource_type="service",
-                    current_request=None,
-                    observed_average=None,
-                    recommendation=(
-                        f"Service {service.name} appears idle "
-                        f"(100% availability, {avg_latency:.1f}ms avg latency). "
-                        "Consider if this service is still needed."
-                    ),
-                    category="idle_service",
-                ))
+                recommendations.append(
+                    CostRecommendation(
+                        resource_name=service.name,
+                        resource_type="service",
+                        current_request=None,
+                        observed_average=None,
+                        recommendation=(
+                            f"Service {service.name} appears idle "
+                            f"(100% availability, {avg_latency:.1f}ms avg latency). "
+                            "Consider if this service is still needed."
+                        ),
+                        category="idle_service",
+                    )
+                )
 
         return recommendations

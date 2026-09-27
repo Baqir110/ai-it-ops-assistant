@@ -123,7 +123,14 @@ def _execute_k8s_scale(context: dict) -> dict[str, Any]:
     if not deployment:
         return {"success": False, "output": "No deployment specified"}
     return _run_cmd(
-        ["kubectl", "scale", f"deployment/{deployment}", f"--replicas={replicas}", "-n", namespace],
+        [
+            "kubectl",
+            "scale",
+            f"deployment/{deployment}",
+            f"--replicas={replicas}",
+            "-n",
+            namespace,
+        ],
         timeout=30,
     )
 
@@ -167,7 +174,9 @@ def _execute_renew_certificate(context: dict) -> dict[str, Any]:
     domain = context.get("domain", "")
     if not domain:
         return {"success": False, "output": "No domain specified"}
-    return _run_cmd(["certbot", "renew", "--cert-name", domain, "--non-interactive"], timeout=120)
+    return _run_cmd(
+        ["certbot", "renew", "--cert-name", domain, "--non-interactive"], timeout=120
+    )
 
 
 def _execute_retry_backup(context: dict) -> dict[str, Any]:
@@ -185,7 +194,10 @@ def _execute_scale_up(context: dict) -> dict[str, Any]:
 
 def _execute_investigate(context: dict) -> dict[str, Any]:
     """No-op investigation action — always safe."""
-    return {"success": True, "output": "Investigation initiated. Awaiting manual analysis."}
+    return {
+        "success": True,
+        "output": "Investigation initiated. Awaiting manual analysis.",
+    }
 
 
 class RemediationRegistry:
@@ -194,8 +206,15 @@ class RemediationRegistry:
     def __init__(self) -> None:
         self._actions: dict[str, Any] = {}
 
-    def register(self, action_type: str, risk_level: RemediationRisk, approval_required: bool,
-                 rollback_capable: bool, description: str, executor: Callable) -> None:
+    def register(
+        self,
+        action_type: str,
+        risk_level: RemediationRisk,
+        approval_required: bool,
+        rollback_capable: bool,
+        description: str,
+        executor: Callable,
+    ) -> None:
         self._actions[action_type] = {
             "risk_level": risk_level,
             "approval_required": approval_required,
@@ -217,30 +236,108 @@ class RemediationRegistry:
 def create_default_registry() -> RemediationRegistry:
     """Create a registry with all built-in actions."""
     registry = RemediationRegistry()
-    registry.register("restart_service", RemediationRisk.MEDIUM, True, False,
-                      "Restart a system service", _execute_restart_service)
-    registry.register("retry_health_check", RemediationRisk.LOW, False, False,
-                      "Retry a health check endpoint", _execute_retry_health_check)
-    registry.register("clear_cache", RemediationRisk.LOW, False, False,
-                      "Clear application cache", _execute_clear_cache)
-    registry.register("k8s_rollout_restart", RemediationRisk.MEDIUM, True, True,
-                      "Kubernetes rollout restart", _execute_k8s_rollout_restart)
-    registry.register("rollback_deployment", RemediationRisk.HIGH, True, True,
-                      "Rollback to previous deployment", _execute_k8s_rollback)
-    registry.register("k8s_scale", RemediationRisk.MEDIUM, True, True,
-                      "Scale Kubernetes deployment", _execute_k8s_scale)
-    registry.register("clear_logs", RemediationRisk.LOW, False, False,
-                      "Clear old log files", _execute_clear_logs)
-    registry.register("restart_container", RemediationRisk.LOW, False, False,
-                      "Restart a Docker container", _execute_restart_container)
-    registry.register("refresh_monitoring", RemediationRisk.LOW, False, False,
-                      "Refresh monitoring configuration", _execute_refresh_monitoring)
-    registry.register("renew_certificate", RemediationRisk.MEDIUM, True, False,
-                      "Renew SSL certificate", _execute_renew_certificate)
-    registry.register("retry_backup", RemediationRisk.LOW, False, False,
-                      "Retry failed backup", _execute_retry_backup)
-    registry.register("scale_up", RemediationRisk.MEDIUM, True, True,
-                      "Scale up service capacity", _execute_scale_up)
-    registry.register("investigate", RemediationRisk.LOW, False, False,
-                      "Manual investigation required", _execute_investigate)
+    registry.register(
+        "restart_service",
+        RemediationRisk.MEDIUM,
+        True,
+        False,
+        "Restart a system service",
+        _execute_restart_service,
+    )
+    registry.register(
+        "retry_health_check",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Retry a health check endpoint",
+        _execute_retry_health_check,
+    )
+    registry.register(
+        "clear_cache",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Clear application cache",
+        _execute_clear_cache,
+    )
+    registry.register(
+        "k8s_rollout_restart",
+        RemediationRisk.MEDIUM,
+        True,
+        True,
+        "Kubernetes rollout restart",
+        _execute_k8s_rollout_restart,
+    )
+    registry.register(
+        "rollback_deployment",
+        RemediationRisk.HIGH,
+        True,
+        True,
+        "Rollback to previous deployment",
+        _execute_k8s_rollback,
+    )
+    registry.register(
+        "k8s_scale",
+        RemediationRisk.MEDIUM,
+        True,
+        True,
+        "Scale Kubernetes deployment",
+        _execute_k8s_scale,
+    )
+    registry.register(
+        "clear_logs",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Clear old log files",
+        _execute_clear_logs,
+    )
+    registry.register(
+        "restart_container",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Restart a Docker container",
+        _execute_restart_container,
+    )
+    registry.register(
+        "refresh_monitoring",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Refresh monitoring configuration",
+        _execute_refresh_monitoring,
+    )
+    registry.register(
+        "renew_certificate",
+        RemediationRisk.MEDIUM,
+        True,
+        False,
+        "Renew SSL certificate",
+        _execute_renew_certificate,
+    )
+    registry.register(
+        "retry_backup",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Retry failed backup",
+        _execute_retry_backup,
+    )
+    registry.register(
+        "scale_up",
+        RemediationRisk.MEDIUM,
+        True,
+        True,
+        "Scale up service capacity",
+        _execute_scale_up,
+    )
+    registry.register(
+        "investigate",
+        RemediationRisk.LOW,
+        False,
+        False,
+        "Manual investigation required",
+        _execute_investigate,
+    )
     return registry

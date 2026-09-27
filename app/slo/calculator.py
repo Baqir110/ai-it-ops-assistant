@@ -45,7 +45,9 @@ class SLOCalculator:
                 result = self._evaluate_slo(slo)
                 if result:
                     results.append(result)
-                    SLO_MEASUREMENTS.labels(slo=slo.name, within_target=str(result["within_target"])).inc()
+                    SLO_MEASUREMENTS.labels(
+                        slo=slo.name, within_target=str(result["within_target"])
+                    ).inc()
             except Exception as e:
                 logger.warning("SLO evaluation failed for %s: %s", slo.name, e)
 
@@ -130,12 +132,14 @@ class SLOCalculator:
         since = datetime.now(timezone.utc) - timedelta(hours=1)
 
         latencies = self._db.scalars(
-            select(ServiceCheck.latency_ms).where(
+            select(ServiceCheck.latency_ms)
+            .where(
                 and_(
                     ServiceCheck.checked_at >= since,
                     ServiceCheck.latency_ms.is_not(None),
                 )
-            ).order_by(ServiceCheck.latency_ms)
+            )
+            .order_by(ServiceCheck.latency_ms)
         ).all()
 
         if not latencies:
@@ -193,9 +197,12 @@ class SLOCalculator:
     def _count_incidents(self) -> int:
         """Count incidents in the last 30 days."""
         since = datetime.now(timezone.utc) - timedelta(days=30)
-        return self._db.scalar(
-            select(func.count(Incident.id)).where(Incident.detected_at >= since)
-        ) or 0
+        return (
+            self._db.scalar(
+                select(func.count(Incident.id)).where(Incident.detected_at >= since)
+            )
+            or 0
+        )
 
     def get_sre_summary(self) -> dict:
         """Get a summary of key SRE metrics."""

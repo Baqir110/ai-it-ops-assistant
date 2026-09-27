@@ -70,7 +70,9 @@ class HTTPHealthDetector(Detector):
                     self._failure_counts[svc.name] = 0
 
                 if is_new_failure or is_latency_issue:
-                    events.append(self._build_event(svc, check, is_new_failure, is_latency_issue))
+                    events.append(
+                        self._build_event(svc, check, is_new_failure, is_latency_issue)
+                    )
 
         finally:
             db.close()

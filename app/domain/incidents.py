@@ -51,7 +51,9 @@ TERMINAL_STATES = {IncidentStatus.RESOLVED, IncidentStatus.CLOSED}
 OPEN_STATES = set(IncidentStatus) - TERMINAL_STATES
 
 
-def can_transition(from_status: IncidentStatus | str, to_status: IncidentStatus | str) -> bool:
+def can_transition(
+    from_status: IncidentStatus | str, to_status: IncidentStatus | str
+) -> bool:
     """Check if a state transition is valid."""
     if isinstance(from_status, str):
         from_status = IncidentStatus(from_status)

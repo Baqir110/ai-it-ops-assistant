@@ -109,7 +109,9 @@ class RecoveryVerifier:
             # Check 2: Availability over recent window
             db = self._db_factory()
             try:
-                availability = get_service_availability(db, service.id, window_minutes=5)
+                availability = get_service_availability(
+                    db, service.id, window_minutes=5
+                )
                 if availability >= 95.0:
                     checks_passed += 1
             finally:

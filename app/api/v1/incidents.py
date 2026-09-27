@@ -226,9 +226,7 @@ def change_incident_status(
 
     updated = update_incident_status(db, incident_id, new_status)
 
-    INCIDENT_STATUS_CHANGES.labels(
-        from_status=old_status, to_status=new_status
-    ).inc()
+    INCIDENT_STATUS_CHANGES.labels(from_status=old_status, to_status=new_status).inc()
 
     add_incident_event(
         db,
@@ -261,7 +259,9 @@ def acknowledge_incident(
 
     from datetime import datetime, timezone
 
-    updated = update_incident(db, incident_id, acknowledged_at=datetime.now(timezone.utc))
+    updated = update_incident(
+        db, incident_id, acknowledged_at=datetime.now(timezone.utc)
+    )
 
     add_incident_event(
         db,

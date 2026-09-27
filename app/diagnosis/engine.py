@@ -69,9 +69,15 @@ class DiagnosisEngine:
         runbook_key = RUNBOOK_MAP.get(event_type)
 
         # Analyze evidence patterns
-        health_evidence = self._analyze_health_evidence(evidence_by_type.get("health_checks", []))
-        detection_evidence = self._analyze_detection_evidence(evidence_by_type.get("detection_events", []))
-        service_evidence = self._analyze_service_evidence(evidence_by_type.get("service_info", []))
+        health_evidence = self._analyze_health_evidence(
+            evidence_by_type.get("health_checks", [])
+        )
+        detection_evidence = self._analyze_detection_evidence(
+            evidence_by_type.get("detection_events", [])
+        )
+        service_evidence = self._analyze_service_evidence(
+            evidence_by_type.get("service_info", [])
+        )
 
         # Build diagnosis based on evidence
         probable_cause, confidence, alternatives = self._determine_cause(
@@ -178,13 +184,21 @@ class DiagnosisEngine:
                     f"Service {incident.affected_service_id} is completely unavailable. "
                     f"All health checks failing ({failures} consecutive failures).",
                     0.85,
-                    ["Service process crashed", "Network connectivity issue", "Dependency failure"],
+                    [
+                        "Service process crashed",
+                        "Network connectivity issue",
+                        "Dependency failure",
+                    ],
                 )
             return (
                 f"Service experiencing intermittent failures. "
                 f"Availability dropped to {availability}%.",
                 0.70,
-                ["Resource exhaustion", "Dependency degradation", "Configuration issue"],
+                [
+                    "Resource exhaustion",
+                    "Dependency degradation",
+                    "Configuration issue",
+                ],
             )
 
         if event_type == "http_latency_degradation":
@@ -193,7 +207,11 @@ class DiagnosisEngine:
                 f"Service latency degraded to {avg_latency}ms average. "
                 "Possible causes: resource contention, downstream dependency slowdown, or inefficient queries.",
                 0.65,
-                ["Database slowdown", "External API degradation", "Resource contention"],
+                [
+                    "Database slowdown",
+                    "External API degradation",
+                    "Resource contention",
+                ],
             )
 
         if event_type == "cpu_high":
@@ -217,7 +235,11 @@ class DiagnosisEngine:
                 "Disk utilization exceeded threshold. "
                 "Possible causes: log accumulation, large temp files, or insufficient disk space.",
                 0.75,
-                ["Log files not rotated", "Temporary files accumulating", "Disk undersized"],
+                [
+                    "Log files not rotated",
+                    "Temporary files accumulating",
+                    "Disk undersized",
+                ],
             )
 
         if event_type == "http_error_rate":
@@ -225,14 +247,22 @@ class DiagnosisEngine:
                 "HTTP error rate exceeded threshold. "
                 "Possible causes: bad deployment, downstream service failure, or configuration error.",
                 0.75,
-                ["Bad deployment", "Downstream dependency failure", "Configuration regression"],
+                [
+                    "Bad deployment",
+                    "Downstream dependency failure",
+                    "Configuration regression",
+                ],
             )
 
         if event_type == "bad_deployment":
             return (
                 "Deployment regression detected. Error rate spike correlates with recent deployment.",
                 0.85,
-                ["Code regression", "Configuration change", "Dependency version mismatch"],
+                [
+                    "Code regression",
+                    "Configuration change",
+                    "Dependency version mismatch",
+                ],
             )
 
         if event_type == "kubernetes_crashloop":
@@ -240,7 +270,11 @@ class DiagnosisEngine:
                 "Kubernetes pod in CrashLoopBackOff. "
                 "Possible causes: application error on startup, missing config, or resource limits.",
                 0.80,
-                ["Application startup failure", "Missing ConfigMap/Secret", "OOMKilled"],
+                [
+                    "Application startup failure",
+                    "Missing ConfigMap/Secret",
+                    "OOMKilled",
+                ],
             )
 
         if event_type == "certificate_expiring":
@@ -256,7 +290,11 @@ class DiagnosisEngine:
                 "Backup job failed. "
                 "Possible causes: storage full, network issue, or backup script error.",
                 0.80,
-                ["Storage capacity exceeded", "Network connectivity", "Backup script error"],
+                [
+                    "Storage capacity exceeded",
+                    "Network connectivity",
+                    "Backup script error",
+                ],
             )
 
         # Generic fallback

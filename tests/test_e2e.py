@@ -33,6 +33,7 @@ client = TestClient(app)
 def auth_token():
     """Get an auth token for API calls."""
     import uuid
+
     username = f"e2euser_{uuid.uuid4().hex[:8]}"
     client.post(
         "/api/v1/auth/register",
@@ -173,6 +174,7 @@ def test_service_recovery_detection(auth_token):
 
     # Create a service
     import uuid
+
     name = f"recovery-test-{uuid.uuid4().hex[:8]}"
     resp = client.post(
         "/api/v1/services",

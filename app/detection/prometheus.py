@@ -45,11 +45,23 @@ class PrometheusDetector(Detector):
             ("cpu_high", self._cpu_query(), settings.CPU_THRESHOLD, "percent"),
             ("memory_high", self._memory_query(), settings.RAM_THRESHOLD, "percent"),
             ("disk_high", self._disk_query(), settings.DISK_THRESHOLD, "percent"),
-            ("http_error_rate", self._error_rate_query(), settings.HTTP_ERROR_RATE_THRESHOLD, "percent"),
-            ("http_latency_p95", self._latency_query(), settings.HTTP_LATENCY_P95_THRESHOLD_MS, "ms"),
+            (
+                "http_error_rate",
+                self._error_rate_query(),
+                settings.HTTP_ERROR_RATE_THRESHOLD,
+                "percent",
+            ),
+            (
+                "http_latency_p95",
+                self._latency_query(),
+                settings.HTTP_LATENCY_P95_THRESHOLD_MS,
+                "ms",
+            ),
         ]
 
-        async with httpx.AsyncClient(timeout=settings.PROMETHEUS_QUERY_TIMEOUT) as client:
+        async with httpx.AsyncClient(
+            timeout=settings.PROMETHEUS_QUERY_TIMEOUT
+        ) as client:
             for event_type, query, threshold, unit in queries:
                 try:
                     results = await self._query(client, query)
@@ -67,7 +79,10 @@ class PrometheusDetector(Detector):
                                 service=result.get("metric", {}).get("service"),
                                 value=value,
                                 threshold=threshold,
-                                metadata={"unit": unit, "metric": result.get("metric", {})},
+                                metadata={
+                                    "unit": unit,
+                                    "metric": result.get("metric", {}),
+                                },
                             )
                             events.append(event)
                             PROMETHEUS_DETECTIONS.labels(type=event_type).inc()

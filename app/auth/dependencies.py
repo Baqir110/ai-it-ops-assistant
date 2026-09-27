@@ -31,6 +31,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
 
 def require_role(allowed_roles: list[str]):
     """Dependency factory that checks if the user has an allowed role."""
+
     def role_checker(current_user: dict = Depends(get_current_user)) -> dict:
         if current_user["role"].value not in allowed_roles:
             raise HTTPException(
